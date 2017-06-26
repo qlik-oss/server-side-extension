@@ -1,0 +1,11 @@
+basicConstraints        = CA:FALSE
+keyUsage            = digitalSignature, keyEncipherment
+extendedKeyUsage  = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = *.rdlund.qliktech.com
+DNS.2 = *.qliktech.com
+DNS.3 = localhost
+DNS.4 = 127.0.0.1
+DNS.5 = ::1

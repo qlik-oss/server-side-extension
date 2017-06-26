@@ -1,0 +1,131 @@
+/*
+ * Insert legal notice here.
+ */
+syntax="proto3";
+
+/**
+ * A gRPC definition for the Qlik engine extension protocol.
+ */
+package qlik.sse;
+
+/**
+ * Enable protobuf arena allocations in C++.
+ * Using an arena can boost performance by reducing the overhead for heap allocations.
+ */
+option cc_enable_arenas = true;
+
+/**
+ * Data types of the parameters and return values.
+ */
+enum DataType {
+    STRING = 0;     /// Contains only string.
+    NUMERIC = 1;    /// Contains only double.
+    DUAL = 2;       /// Contains both a string and a double.
+}
+
+/**
+ * Types of functions (determined by their return values).
+ */
+enum FunctionType {
+    SCALAR = 0;         /// The return value is a scalar per row.
+    AGGREGATION = 1;    /// All rows are aggregated into a single scalar.
+    TENSOR = 2;         /// Multiple rows in, multiple rows out.
+}
+
+/**
+ * An empty message used when nothing is to be passed in a call.
+ */
+message Empty {}
+
+/**
+ * Parameter definition for functions and script calls.
+ */
+message Parameter {
+    DataType dataType = 1;  /// The data type of the parameter.
+    string name = 2;        /// The name of the parameter.
+}
+
+/**
+ * The definition of a function, which informs the Qlik engine how to use it.
+ */
+message FunctionDefinition {
+    string name = 1;                /// The name of the function.
+    FunctionType functionType = 2;  /// The type of the function.
+    DataType returnType = 3;        /// The return type of the function.
+    repeated Parameter params = 4;  /// The parameters the function takes.
+    int32 functionId = 5;           /// A unique ID number for the function, set by the plugin, to be used in calls from the Qlik engine to the plugin.
+}
+
+/**
+ * A full description of the plugin, sent to the Qlik engine, listing all functions available and indicating whether script evaluation is allowed.
+ */
+message Capabilities {
+    bool allowScript = 1;                       /// When true, the Qlik engine allows scripts to be sent to the plugin.
+    repeated FunctionDefinition functions = 2;  /// The definitions of all available functions.
+    string pluginIdentifier = 3;                /// The ID or name of the plugin.
+    string pluginVersion = 4;                   /// The version of the plugin.
+}
+
+/**
+ * The basic data type for the data stream. Can contain double, string, or both.
+ */
+message Dual {
+    double numData = 1; /// Numeric value as double.
+    string strData = 2; /// String.
+}
+
+/**
+ * A row of duals.
+ */
+message Row {
+    repeated Dual duals = 1; /// Row of duals.
+}
+
+/**
+ * A number of rows collected in one message. The actual number will depend on the size of each row and is adjusted to optimize throughput.
+ */
+message BundledRows {
+    repeated Row rows = 1;
+}
+
+/**
+ * A header sent at the start of an EvaluateScript request under the key "qlik-scriptrequestheader-bin".
+ */
+message ScriptRequestHeader {
+    string script = 1;              /// The script to be executed.
+    FunctionType functionType = 2;  /// The function type of the script evaluation: scalar, aggregation or tensor.
+    DataType returnType = 3;        /// The return type from the script evaluation: numeric, string or both.
+    repeated Parameter params = 4;  /// The parameters names and types passed to the script.
+}
+
+/**
+ * A header sent at the start of an ExecuteFunction request under the key "qlik-functionrequestheader-bin".
+ */
+message FunctionRequestHeader {
+    int32 functionId = 1;   /// The ID of the function to be executed.
+    string version = 2;     /// A dummy variable as a workaround for an issue.
+}
+
+/**
+ * A header sent at the start of both an EvaluateScript request and an ExecuteFunction request under the key "qlik-commonrequestheader-bin".
+ */
+message CommonRequestHeader {
+    string appId = 1;       /// The ID of the app the request was executed in.
+    string userId = 2;      /// The ID of the user the request was executed by.
+    int64 cardinality = 3;  /// The cardinality of the parameters.
+}
+
+/**
+ * The communication service provided between the Qlik engine and the plugin.
+ */
+service Connector
+{
+    /// A handshake call for the Qlik engine to retrieve the capability of the plugin.
+    rpc GetCapabilities (Empty) returns (Capabilities) {}
+
+    /// Requests a function to be executed as specified in the header.
+    rpc ExecuteFunction (stream BundledRows) returns (stream BundledRows) {}
+    
+    /// Requests a script to be evaluated as specified in the header.
+    rpc EvaluateScript (stream BundledRows) returns (stream BundledRows) {}
+}
