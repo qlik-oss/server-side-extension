@@ -70,7 +70,7 @@ git push -u myfork my-feature-or-bugfix
 
 Before creating a Pull Request, make sure the following items are satisfied:
 
-- CircleCI is green (OBS!! This does not work with SSE yet right?)
+- CircleCI is green
 - Commit message format is followed
 - [CLA](#cla) is signed
 
