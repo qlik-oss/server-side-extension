@@ -1,8 +1,8 @@
 # Server Side Extension
 
-This repository provides a server-side extension (SSE) protocol based on gRPC that allows you to extend the Qlik built-in expression library with functionality from external calculation engines. You can use external calculations engines from both load script expressions and chart expressions. These SSE plugins are referred to as analytic connections in Qlik Sense.
-
-This repository includes documentation that describes the SSE protocol, how to use it and how to build your own plugins. Currently we have examples written in a few different languages only but examples in more languages will come later.
+This repository provides a server-side extension (SSE) protocol based on gRPC that allows you to extend the Qlik built-in expression library with functionality from external calculation engines. You can use external calculations engines from both load script expressions and chart expressions. These SSE plugins are referred to as analytic connections in Qlik Sense.  
+SSE is part of the Advanced Analytics Integration (AAI) concept at Qlik.  
+This repository includes documentation that describes the SSE protocol, how to use it and how to build your own plugins. Currently we have examples written in a few different languages only but examples in more languages will come later.  
 
 ## Status
 **Current Plugin Version and State:** v1.0.0  
