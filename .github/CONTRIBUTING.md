@@ -1,6 +1,6 @@
-# Contributing to grpc-sse
+# Contributing to server-side-extension
 
-You are more than welcome to contribute to grpc-sse! Follow these guidelines and you will be ready to start:
+You are more than welcome to contribute to server-side-extension! Follow these guidelines and you will be ready to start:
 
  - [Code of conduct](#code-of-conduct)
  - [Bugs](#bugs)
@@ -41,7 +41,7 @@ Generally, development should be done directly towards the `master` branch.
 1\. Fork and clone the repository
 
 ```sh
-git clone git@github.com:YOUR-USERNAME/grpc-sse.git
+git clone git@github.com:YOUR-USERNAME/server-side-extension.git
 ```
 
 2\. Create a branch in the fork
