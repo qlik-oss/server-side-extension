@@ -1,6 +1,6 @@
 # Getting started with the Python examples
 
-We provide several examples at different levels of complexity, each of which is documented separately. All examples support mutual authentication. Note that the examples do **not** necessarily support the same functionality; therefore a function call in one example might not work in another. 
+We provide several examples at different levels of complexity, each of which is documented separately. All examples support mutual authentication. Note that the examples do **not** necessarily support the same functionality; therefore a function call in one example might not work in another.
 
 The following table includes a short description of each example and the functionality it demonstrates.
 
@@ -29,8 +29,8 @@ Follow these steps to quickly set up and run an example of your choice on your l
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
 3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file located at *C:\Users\\[user]\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
 4. Copy the *.qvf* file from the selected example folder to *C:\Users\\[user]\Qlik\Sense\Apps*.
-5. Run the corresponding *ExtensionService_<examplename>.py* file. The easiest way to do this is to open a command prompt, go to the selected example folder and type:
-  
+5. Run the corresponding `ExtensionService_<examplename>.py` file. The easiest way to do this is to open a command prompt, go to the selected example folder and type:
+
    `python ExtensionService_<examplename>.py`  
 
    Insert the value for `<examplename>` from the table above for the selected example.
@@ -41,11 +41,11 @@ Follow these steps to quickly set up and run an example of your choice on your l
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
 3. Add the SSE plugin settings in QMC under __Analytic connections__ by inserting the following values:  **name:** `<EngineName>`, **host:** localhost, **port:** `<port>`
 
-    Alternatively, add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *settings.ini* file located at *C:\ProgramData\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example. 
+    Alternatively, add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *settings.ini* file located at *C:\ProgramData\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
 
     __Note:__ Configuring the plugin via the *settings.ini* file is only valid for this node/machine; the settings will not be visible in the QMC. Also no access rules would apply in this case.
 4. Add the *.qvf* file from the selected example folder to QMC.
-5. Run the corresponding *ExtensionService_<examplename>.py* file. The easiest way to do this is to open a command prompt, go to folder for the selected example and type:
+5. Run the corresponding `ExtensionService_<examplename>.py` file. The easiest way to do this is to open a command prompt, go to folder for the selected example and type:
 
    `python ExtensionService_<examplename>.py`
 
