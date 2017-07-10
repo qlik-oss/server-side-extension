@@ -5,6 +5,8 @@ SSE is part of the Advanced Analytics Integration (AAI) concept at Qlik.
 This repository includes documentation that describes the SSE protocol, how to use it and how to build your own plugins. Currently we have examples written in a few different languages only but examples in more languages will come later.  
 
 ## Status
+[![CircleCI](https://circleci.com/gh/qlik-oss/server-side-extension.svg?style=shield)](https://circleci.com/gh/qlik-oss/server-side-extension)  
+
 **Current Plugin Version and State:** v1.0.0  
 **Matching Qlik Sense Version:** Qlik Sense 2017 release (or later). Both desktop and enterprise.  
 **Examples:** The examples provided are not meant to be used in production, therefore **no support is provided**.  
