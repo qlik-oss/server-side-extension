@@ -50,7 +50,8 @@ You call these functions in the same way as the preceding ones, except you must 
 
 where:
 
-* `<ParameterDataTypes>` : A string containing the data types of the parameters, ordered according to the specified parameters. For example, 'NSD' means we have provided three parameters, the first one is numeric (N), the second one string (S), and the last one dual (D).
+* `<ParameterDataTypes>` : A string containing the data types of the parameters, ordered according to the specified parameters. For example, 'NSD' means we have provided three parameters, the first one is numeric (N), the second one string (S), and the last one dual (D).  
+__Note:__ There is a known issue, in the Sense June 2017 release, about error handling when _more_ parameters are sent than number of data types specified. Reproducing this issue requires restarting either the plugin or the Qlik engine, see the [Limitations](limitations.md) page for more information.
 
 ## Function evaluation
 There are a number of reasons you might want to define your own functions instead of using the script functionality.
