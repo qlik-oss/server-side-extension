@@ -10,3 +10,4 @@ obj
 packages
 *.VC.db
 *.VC.opendb
+Protobuf generated

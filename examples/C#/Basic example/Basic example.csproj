@@ -75,6 +75,13 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\Grpc.Core.1.4.1\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Grpc.Core.1.4.1\build\net45\Grpc.Core.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>set TOOLS_DIR="$(ProjectDir)packages\Grpc.Tools.1.4.1\tools\windows_x64"
+set PROTO_DIR="$(ProjectDir)..\..\..\proto"
+set OUT_DIR="$(ProjectDir)Protobuf generated"
+%25TOOLS_DIR%25\protoc -I%25PROTO_DIR%25 --grpc_out=%25OUT_DIR%25 --csharp_out=%25OUT_DIR%25 --plugin=protoc-gen-grpc=%25TOOLS_DIR%25\grpc_csharp_plugin.exe %25PROTO_DIR%25\ServerSideExtension.proto
+exit /b %25ERRORLEVEL%25</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
