@@ -2,3 +2,11 @@
 *.o
 *.pb.cc
 *.pb.h
+*.suo
+*.csproj.user
+*.DotSettings.user
+bin
+obj
+packages
+*.VC.db
+*.VC.opendb
