@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Core.Utils;
 using Qlik.Sse;
@@ -15,26 +17,31 @@ namespace Basic_example
     /// </summary>
     class BasicExampleConnector : Qlik.Sse.Connector.ConnectorBase
     {
+        private static readonly Capabilities ConnectorCapabilities = new Capabilities
+        {
+            PluginIdentifier = "CSharp Basic example",
+            PluginVersion = "1.0.0",
+            AllowScript = true,
+            Functions =
+            {
+                new FunctionDefinition {FunctionId = 0, FunctionType = FunctionType.Scalar, Name = "OneConstantPerRow", Params = {new Parameter {Name = "SingleUnusedColumn", DataType = DataType.Dual} }, ReturnType = DataType.Numeric}
+            }
+        };
         public override Task<Capabilities> GetCapabilities(Empty request, ServerCallContext context)
         {
-            Console.WriteLine("GetCapabilities");
-            return Task.FromResult(new Capabilities
-            {
-                PluginIdentifier = "CSharp Basic example",
-                PluginVersion = "1.0.0",
-                AllowScript = false,
-                Functions =
-                {
-                    new FunctionDefinition {FunctionId = 0, FunctionType = FunctionType.Scalar, Name = "OneConstantPerRow", Params = {new Parameter {Name = "SingleUnusedColumn", DataType = DataType.Dual} }, ReturnType = DataType.Numeric}
-                }                
-            }
-                
-            );
+            Console.WriteLine("-- GetCapabilities --");
+
+            TraceServerCallContext(context);
+
+            return Task.FromResult(ConnectorCapabilities);
         }
 
         public override async Task ExecuteFunction(IAsyncStreamReader<BundledRows> requestStream, IServerStreamWriter<BundledRows> responseStream, ServerCallContext context)
         {
-            Console.WriteLine("ExecuteFunction");
+
+            Console.WriteLine("-- ExecuteFunction --");
+
+            TraceServerCallContext(context);
 
             var requestAsList = await requestStream.ToListAsync(); // We want to be sure to keep the order of rows when executing and writing to the response.
 
@@ -51,9 +58,77 @@ namespace Basic_example
             }
         }
 
+        private static void TraceServerCallContext(ServerCallContext context)
+        {
+            var authContext = context.AuthContext;
+
+            Console.WriteLine($"ServerCallContext.Method : {context.Method}");
+            Console.WriteLine($"ServerCallContext.Host : {context.Host}");
+            Console.WriteLine($"ServerCallContext.Peer : {context.Peer}");
+            foreach (var contextRequestHeader in context.RequestHeaders)
+            {
+                Console.WriteLine(
+                    $"{contextRequestHeader.Key} : {(contextRequestHeader.IsBinary ? "<binary>" : contextRequestHeader.Value)}");
+
+                if (contextRequestHeader.Key == "qlik-functionrequestheader-bin")
+                {
+                    var functionRequestHeader = new FunctionRequestHeader();
+                    functionRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
+
+                    Console.WriteLine($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
+                    Console.WriteLine($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
+                }
+                else if (contextRequestHeader.Key == "qlik-commonrequestheader-bin")
+                {
+                    var commonRequestHeader = new CommonRequestHeader();
+                    commonRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
+
+                    Console.WriteLine($"CommonRequestHeader.FunctionId : {commonRequestHeader.AppId}");
+                    Console.WriteLine($"CommonRequestHeader.Cardinality : {commonRequestHeader.Cardinality}");
+                    Console.WriteLine($"CommonRequestHeader.UserId : {commonRequestHeader.UserId}");
+                }
+                else if (contextRequestHeader.Key == "qlik-scriptrequestheader-bin")
+                {
+                    var scriptRequestHeader = new ScriptRequestHeader();
+                    scriptRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
+
+                    Console.WriteLine($"ScriptRequestHeader.FunctionType : {scriptRequestHeader.FunctionType}");
+                    Console.WriteLine($"ScriptRequestHeader.ReturnType : {scriptRequestHeader.ReturnType}");
+
+                    int paramIdx = 0;
+                    foreach (var parameter in scriptRequestHeader.Params)
+                    {
+                        Console.WriteLine($"ScriptRequestHeader.Params[{paramIdx}].Name : {parameter.Name}");
+                        Console.WriteLine($"ScriptRequestHeader.Params[{paramIdx}].DataType : {parameter.DataType}");
+                        ++paramIdx;
+                    }
+                    Console.WriteLine($"CommonRequestHeader.Script : {scriptRequestHeader.Script}");
+                }
+            }
+
+            Console.WriteLine($"ServerCallContext.AuthContext.IsPeerAuthenticated : {authContext.IsPeerAuthenticated}");
+            Console.WriteLine(
+                $"ServerCallContext.AuthContext.PeerIdentityPropertyName : {authContext.PeerIdentityPropertyName}");
+            foreach (var authContextProperty in authContext.Properties)
+            {
+                var loggedValue = authContextProperty.Value;
+                var firstLineLength = loggedValue.IndexOf('\n');
+                if (firstLineLength > 0)
+                {
+                    loggedValue = loggedValue.Substring(0, firstLineLength) + "<truncated at linefeed>";
+                }
+
+
+                Console.WriteLine($"{authContextProperty.Name} : {loggedValue}");
+            }
+        }
+
         public override async Task EvaluateScript(IAsyncStreamReader<BundledRows> requestStream, IServerStreamWriter<BundledRows> responseStream, ServerCallContext context)
         {
-            Console.WriteLine("EvaluateScript");
+            Console.WriteLine("-- EvaluateScript --");
+
+            TraceServerCallContext(context);
+
             await base.EvaluateScript(requestStream, responseStream, context);
         }
     }
