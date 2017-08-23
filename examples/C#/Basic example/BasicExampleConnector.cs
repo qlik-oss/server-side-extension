@@ -17,6 +17,13 @@ namespace Basic_example
     /// </summary>
     class BasicExampleConnector : Qlik.Sse.Connector.ConnectorBase
     {
+
+        private enum FunctionConstant
+        {
+            Add42,
+            SumOfAllNumbers
+        };
+
         private static readonly Capabilities ConnectorCapabilities = new Capabilities
         {
             PluginIdentifier = "CSharp Basic example",
@@ -24,7 +31,20 @@ namespace Basic_example
             AllowScript = true,
             Functions =
             {
-                new FunctionDefinition {FunctionId = 0, FunctionType = FunctionType.Scalar, Name = "OneConstantPerRow", Params = {new Parameter {Name = "SingleUnusedColumn", DataType = DataType.Dual} }, ReturnType = DataType.Numeric}
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.Add42,
+                    FunctionType = FunctionType.Scalar,
+                    Name = "Add42",
+                    Params = {new Parameter {Name = "SingleNumericColumn", DataType = DataType.Numeric} },
+                    ReturnType = DataType.Numeric
+                },
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.SumOfAllNumbers,
+                    FunctionType = FunctionType.Aggregation,
+                    Name = "SumOfAllNumbers",
+                    Params = {new Parameter {Name = "AnyShapeOfTable", DataType = DataType.Numeric} },
+                    ReturnType = DataType.Numeric
+                }
             }
         };
         public override Task<Capabilities> GetCapabilities(Empty request, ServerCallContext context)
@@ -43,19 +63,67 @@ namespace Basic_example
 
             TraceServerCallContext(context);
 
+            var functionRequestHeaderStream = context.RequestHeaders.SingleOrDefault(header => header.Key == "qlik-functionrequestheader-bin");
+
+            if (functionRequestHeaderStream == null)
+            {
+                throw new Exception("ExecuteFunction called without Function Request Header in Request Headers.");
+            }
+
+            var functionRequestHeader = new FunctionRequestHeader();
+            functionRequestHeader.MergeFrom(new CodedInputStream(functionRequestHeaderStream.ValueBytes));
+
+
+
+            Console.WriteLine($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
+            Console.WriteLine($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
+
             var requestAsList = await requestStream.ToListAsync(); // We want to be sure to keep the order of rows when executing and writing to the response.
 
-            foreach (var bundledRows in requestAsList)
+            switch (functionRequestHeader.FunctionId)
             {
-                var resultBundle = new BundledRows();
-                foreach (var row in bundledRows.Rows)
-                {
-                    var resultRow = new Row();
-                    resultRow.Duals.Add(new Dual { NumData = row.Duals[0].NumData + 42.0 });
-                    resultBundle.Rows.Add(resultRow);
-                }
-                await responseStream.WriteAsync(resultBundle);
+                case (int)FunctionConstant.Add42:
+                    {
+                        foreach (var bundledRows in requestAsList)
+                        {
+                            var resultBundle = new BundledRows();
+                            foreach (var row in bundledRows.Rows)
+                            {
+                                var resultRow = new Row();
+                                resultRow.Duals.Add(new Dual { NumData = row.Duals[0].NumData + 42.0 });
+                                resultBundle.Rows.Add(resultRow);
+                            }
+                            await responseStream.WriteAsync(resultBundle);
+                        }
+                        break;
+                    }
+                case (int)FunctionConstant.SumOfAllNumbers:
+                    {
+                        double sum = 0.0;
+                        foreach (var bundledRows in requestAsList)
+                        {
+
+                            foreach (var row in bundledRows.Rows)
+                            {
+                                sum = sum + row.Duals.Select(d => d.NumData).Sum();
+                            }
+
+                        }
+
+                        var resultBundle = new BundledRows();
+                        var resultRow = new Row();
+                        resultRow.Duals.Add(new Dual { NumData = sum });
+                        resultBundle.Rows.Add(resultRow);
+                        await responseStream.WriteAsync(resultBundle);
+                        break;
+                    }
+                default:
+                    break;
+
             }
+
+
+
         }
 
         private static void TraceServerCallContext(ServerCallContext context)
@@ -117,7 +185,6 @@ namespace Basic_example
                 {
                     loggedValue = loggedValue.Substring(0, firstLineLength) + "<truncated at linefeed>";
                 }
-
 
                 Console.WriteLine($"{authContextProperty.Name} : {loggedValue}");
             }
