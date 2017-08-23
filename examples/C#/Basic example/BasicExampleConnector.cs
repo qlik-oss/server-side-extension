@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,8 @@ namespace Basic_example
         private enum FunctionConstant
         {
             Add42,
-            SumOfAllNumbers
+            SumOfAllNumbers,
+            SmartGuessDate
         };
 
         private static readonly Capabilities ConnectorCapabilities = new Capabilities
@@ -44,6 +46,13 @@ namespace Basic_example
                     Name = "SumOfAllNumbers",
                     Params = {new Parameter {Name = "AnyShapeOfTable", DataType = DataType.Numeric} },
                     ReturnType = DataType.Numeric
+                },
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.SmartGuessDate,
+                    FunctionType = FunctionType.Scalar,
+                    Name = "SmartGuessDate",
+                    Params = {new Parameter {Name = "DateString", DataType = DataType.String}, new Parameter {Name = "CultureString", DataType = DataType.String} },
+                    ReturnType = DataType.Dual
                 }
             }
         };
@@ -117,6 +126,29 @@ namespace Basic_example
                         await responseStream.WriteAsync(resultBundle);
                         break;
                     }
+                case (int)FunctionConstant.SmartGuessDate:
+                {
+                    foreach (var bundledRows in requestAsList)
+                    {
+                        var resultBundle = new BundledRows();
+                        foreach (var row in bundledRows.Rows)
+                        {
+                            var dateStringParam = row.Duals[0].StrData;
+                            var cultureParam = row.Duals[1].StrData;
+
+                            var guessedDate =
+                                CultureGuessingDateParser.DateFromStringGuessingCulture(dateStringParam, cultureParam);
+                            
+                            
+
+                            var resultRow = new Row();
+                            resultRow.Duals.Add(new Dual { NumData = (guessedDate-CultureGuessingDateParser.QlikDateBeforeFirstDate).Days, StrData = guessedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)});
+                            resultBundle.Rows.Add(resultRow);
+                        }
+                        await responseStream.WriteAsync(resultBundle);
+                    }
+                    break;
+                }
                 default:
                     break;
 
