@@ -5,20 +5,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Grpc.Core;
+using NLog;
 
 namespace Basic_example
 {
     class Program
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         static void Main(string[] args)
         {
-            var grpcHost = "localhost";
-            int grpcPort = 50051;
-            var certificateFolderFullPath =
-                @"..\..\..\..\..\generate_certs_guide\sse_qliktest_generated_certs\sse_qliktest_server_certs";
+            Logger.Info(
+                $"{Path.GetFileName(System.Reflection.Assembly.GetExecutingAssembly().Location)} uses NLog. Set log level by adding or changing logger rules in NLog.config, setting minLevel=\"Info\" or \"Debug\" or \"Trace\".");
 
+            Logger.Info(
+                $"Changes to NLog config are immediately reflected in running application, unless you change the setting autoReload=\"true\".");
+
+            var grpcHost = Convert.ToString(Properties.Settings.Default.grpcHost ?? "localhost");
+            int grpcPort = Convert.ToInt32(Properties.Settings.Default.grpcPort ?? "50051");
+
+            var certificateFolderFullPath = Convert.ToString(Properties.Settings.Default.certificateFolderFullPath ?? "");
 
             var sslCredentials = ServerCredentials.Insecure;
+
+            Logger.Info("Looking for certificates according to certificateFolderFullPath in config file.");
 
             if (certificateFolderFullPath.Length > 3)
             {
@@ -35,16 +45,16 @@ namespace Basic_example
                     var serverKeyPair = new KeyCertificatePair(serverCert, serverKey);
                     sslCredentials = new SslServerCredentials(new List<KeyCertificatePair>() { serverKeyPair }, rootCert, true);
 
-                    Console.WriteLine($"Path to certificates ({certificateFolderFullPath}) and certificate files found. Opening secure channel with mutual authentication.");
+                    Logger.Info($"Path to certificates ({certificateFolderFullPath}) and certificate files found. Opening secure channel with mutual authentication.");
                 }
                 else
                 {
-                    Console.WriteLine($"Path to certificates ({certificateFolderFullPath}) not found or files missing. Opening insecure channel instead.");
+                    Logger.Warn($"Path to certificates ({certificateFolderFullPath}) not found or files missing. Opening insecure channel instead.");
                 }
             }
             else
             {
-                Console.WriteLine("No certificates defined. Opening insecure channel.");
+                Logger.Info("No certificates defined. Opening insecure channel.");
             }
 
             var server = new Grpc.Core.Server
@@ -54,10 +64,9 @@ namespace Basic_example
             };
 
             server.Start();
-            Console.WriteLine("Press any key to stop Basic example...");
-            Console.WriteLine($"gRPC listening on port {grpcPort}");
+            Logger.Info($"gRPC listening on port {grpcPort}");
+            Logger.Info("Press Enter to stop gRPC server and exit...");
             Console.ReadLine();
-            Console.WriteLine("Shutting Basic example... Bye!");
             server?.ShutdownAsync().Wait();
 
         }

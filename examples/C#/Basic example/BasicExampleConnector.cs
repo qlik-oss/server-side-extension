@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Core.Utils;
+using NLog;
 using Qlik.Sse;
 
 namespace Basic_example
@@ -18,6 +19,7 @@ namespace Basic_example
     /// </summary>
     class BasicExampleConnector : Qlik.Sse.Connector.ConnectorBase
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private enum FunctionConstant
         {
@@ -30,7 +32,7 @@ namespace Basic_example
         {
             PluginIdentifier = "CSharp Basic example",
             PluginVersion = "1.0.0",
-            AllowScript = true,
+            AllowScript = false,
             Functions =
             {
                 new FunctionDefinition {
@@ -58,19 +60,33 @@ namespace Basic_example
         };
         public override Task<Capabilities> GetCapabilities(Empty request, ServerCallContext context)
         {
-            Console.WriteLine("-- GetCapabilities --");
+            if (Logger.IsTraceEnabled)
+            {
+                Logger.Trace("-- GetCapabilities --");
 
-            TraceServerCallContext(context);
+                TraceServerCallContext(context);
+            }
+            else
+            {
+                Logger.Debug("GetCapabilites called");
+            }
+
 
             return Task.FromResult(ConnectorCapabilities);
         }
 
         public override async Task ExecuteFunction(IAsyncStreamReader<BundledRows> requestStream, IServerStreamWriter<BundledRows> responseStream, ServerCallContext context)
         {
+            if (Logger.IsTraceEnabled)
+            {
+                Logger.Trace("-- ExecuteFunction --");
 
-            Console.WriteLine("-- ExecuteFunction --");
-
-            TraceServerCallContext(context);
+                TraceServerCallContext(context);
+            }
+            else
+            {
+                Logger.Debug("ExecuteFunction called");
+            }
 
             var functionRequestHeaderStream = context.RequestHeaders.SingleOrDefault(header => header.Key == "qlik-functionrequestheader-bin");
 
@@ -84,10 +100,10 @@ namespace Basic_example
 
 
 
-            Console.WriteLine($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
-            Console.WriteLine($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
+            Logger.Trace($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
+            Logger.Trace($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
 
-            var requestAsList = await requestStream.ToListAsync(); // We want to be sure to keep the order of rows when executing and writing to the response.
+            var requestAsList = await requestStream.ToListAsync();
 
             switch (functionRequestHeader.FunctionId)
             {
@@ -138,8 +154,6 @@ namespace Basic_example
 
                             var guessedDate =
                                 CultureGuessingDateParser.DateFromStringGuessingCulture(dateStringParam, cultureParam);
-                            
-                            
 
                             var resultRow = new Row();
                             resultRow.Duals.Add(new Dual { NumData = (guessedDate-CultureGuessingDateParser.QlikDateBeforeFirstDate).Days, StrData = guessedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)});
@@ -162,12 +176,12 @@ namespace Basic_example
         {
             var authContext = context.AuthContext;
 
-            Console.WriteLine($"ServerCallContext.Method : {context.Method}");
-            Console.WriteLine($"ServerCallContext.Host : {context.Host}");
-            Console.WriteLine($"ServerCallContext.Peer : {context.Peer}");
+            Logger.Trace($"ServerCallContext.Method : {context.Method}");
+            Logger.Trace($"ServerCallContext.Host : {context.Host}");
+            Logger.Trace($"ServerCallContext.Peer : {context.Peer}");
             foreach (var contextRequestHeader in context.RequestHeaders)
             {
-                Console.WriteLine(
+                Logger.Trace(
                     $"{contextRequestHeader.Key} : {(contextRequestHeader.IsBinary ? "<binary>" : contextRequestHeader.Value)}");
 
                 if (contextRequestHeader.Key == "qlik-functionrequestheader-bin")
@@ -175,39 +189,39 @@ namespace Basic_example
                     var functionRequestHeader = new FunctionRequestHeader();
                     functionRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
 
-                    Console.WriteLine($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
-                    Console.WriteLine($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
+                    Logger.Trace($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
+                    Logger.Trace($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
                 }
                 else if (contextRequestHeader.Key == "qlik-commonrequestheader-bin")
                 {
                     var commonRequestHeader = new CommonRequestHeader();
                     commonRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
 
-                    Console.WriteLine($"CommonRequestHeader.FunctionId : {commonRequestHeader.AppId}");
-                    Console.WriteLine($"CommonRequestHeader.Cardinality : {commonRequestHeader.Cardinality}");
-                    Console.WriteLine($"CommonRequestHeader.UserId : {commonRequestHeader.UserId}");
+                    Logger.Trace($"CommonRequestHeader.FunctionId : {commonRequestHeader.AppId}");
+                    Logger.Trace($"CommonRequestHeader.Cardinality : {commonRequestHeader.Cardinality}");
+                    Logger.Trace($"CommonRequestHeader.UserId : {commonRequestHeader.UserId}");
                 }
                 else if (contextRequestHeader.Key == "qlik-scriptrequestheader-bin")
                 {
                     var scriptRequestHeader = new ScriptRequestHeader();
                     scriptRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
 
-                    Console.WriteLine($"ScriptRequestHeader.FunctionType : {scriptRequestHeader.FunctionType}");
-                    Console.WriteLine($"ScriptRequestHeader.ReturnType : {scriptRequestHeader.ReturnType}");
+                    Logger.Trace($"ScriptRequestHeader.FunctionType : {scriptRequestHeader.FunctionType}");
+                    Logger.Trace($"ScriptRequestHeader.ReturnType : {scriptRequestHeader.ReturnType}");
 
                     int paramIdx = 0;
                     foreach (var parameter in scriptRequestHeader.Params)
                     {
-                        Console.WriteLine($"ScriptRequestHeader.Params[{paramIdx}].Name : {parameter.Name}");
-                        Console.WriteLine($"ScriptRequestHeader.Params[{paramIdx}].DataType : {parameter.DataType}");
+                        Logger.Trace($"ScriptRequestHeader.Params[{paramIdx}].Name : {parameter.Name}");
+                        Logger.Trace($"ScriptRequestHeader.Params[{paramIdx}].DataType : {parameter.DataType}");
                         ++paramIdx;
                     }
-                    Console.WriteLine($"CommonRequestHeader.Script : {scriptRequestHeader.Script}");
+                    Logger.Trace($"CommonRequestHeader.Script : {scriptRequestHeader.Script}");
                 }
             }
 
-            Console.WriteLine($"ServerCallContext.AuthContext.IsPeerAuthenticated : {authContext.IsPeerAuthenticated}");
-            Console.WriteLine(
+            Logger.Trace($"ServerCallContext.AuthContext.IsPeerAuthenticated : {authContext.IsPeerAuthenticated}");
+            Logger.Trace(
                 $"ServerCallContext.AuthContext.PeerIdentityPropertyName : {authContext.PeerIdentityPropertyName}");
             foreach (var authContextProperty in authContext.Properties)
             {
@@ -218,17 +232,8 @@ namespace Basic_example
                     loggedValue = loggedValue.Substring(0, firstLineLength) + "<truncated at linefeed>";
                 }
 
-                Console.WriteLine($"{authContextProperty.Name} : {loggedValue}");
+                Logger.Trace($"{authContextProperty.Name} : {loggedValue}");
             }
-        }
-
-        public override async Task EvaluateScript(IAsyncStreamReader<BundledRows> requestStream, IServerStreamWriter<BundledRows> responseStream, ServerCallContext context)
-        {
-            Console.WriteLine("-- EvaluateScript --");
-
-            TraceServerCallContext(context);
-
-            await base.EvaluateScript(requestStream, responseStream, context);
         }
     }
 }
