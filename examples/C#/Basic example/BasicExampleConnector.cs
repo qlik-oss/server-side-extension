@@ -4,8 +4,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Basic_example.Functionality_to_expose;
 using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Core.Utils;
@@ -17,7 +20,7 @@ namespace Basic_example
     /// <summary>
     /// The BasicExampleConnector inherits the generated class Qlik.Sse.Connector.ConnectorBase
     /// </summary>
-    class BasicExampleConnector : Qlik.Sse.Connector.ConnectorBase
+    class BasicExampleConnector : Connector.ConnectorBase
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -25,7 +28,10 @@ namespace Basic_example
         {
             Add42,
             SumOfAllNumbers,
-            SmartGuessDate
+            ParseDateForLanguage,
+            Concatenate,
+            CallCounter,
+            CallCounterNoCache
         };
 
         private static readonly Capabilities ConnectorCapabilities = new Capabilities
@@ -46,15 +52,36 @@ namespace Basic_example
                     FunctionId = (int)FunctionConstant.SumOfAllNumbers,
                     FunctionType = FunctionType.Aggregation,
                     Name = "SumOfAllNumbers",
-                    Params = {new Parameter {Name = "AnyShapeOfTable", DataType = DataType.Numeric} },
+                    Params = {new Parameter {Name = "SingleNumericColumn", DataType = DataType.Numeric} },
                     ReturnType = DataType.Numeric
                 },
                 new FunctionDefinition {
-                    FunctionId = (int)FunctionConstant.SmartGuessDate,
+                    FunctionId = (int)FunctionConstant.ParseDateForLanguage,
                     FunctionType = FunctionType.Scalar,
-                    Name = "SmartGuessDate",
+                    Name = "ParseDateForLanguage",
                     Params = {new Parameter {Name = "DateString", DataType = DataType.String}, new Parameter {Name = "CultureString", DataType = DataType.String} },
                     ReturnType = DataType.Dual
+                },
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.Concatenate,
+                    FunctionType = FunctionType.Aggregation,
+                    Name = "Concatenate",
+                    Params = {new Parameter {Name = "ColumnarData", DataType = DataType.Dual} },
+                    ReturnType = DataType.String
+                },
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.CallCounter,
+                    FunctionType = FunctionType.Scalar,
+                    Name = "CallCounter",
+                    Params = {new Parameter {Name = "DummyData", DataType = DataType.Dual}},
+                    ReturnType = DataType.Numeric
+                },
+                new FunctionDefinition {
+                    FunctionId = (int)FunctionConstant.CallCounterNoCache,
+                    FunctionType = FunctionType.Scalar,
+                    Name = "CallCounterNoCache",
+                    Params = {new Parameter {Name = "DummyInt", DataType = DataType.Dual} },
+                    ReturnType = DataType.Numeric
                 }
             }
         };
@@ -98,21 +125,16 @@ namespace Basic_example
             var functionRequestHeader = new FunctionRequestHeader();
             functionRequestHeader.MergeFrom(new CodedInputStream(functionRequestHeaderStream.ValueBytes));
 
-
-
-            Logger.Trace($"FunctionRequestHeader.FunctionId : {functionRequestHeader.FunctionId}");
-            Logger.Trace($"FunctionRequestHeader.Version : {functionRequestHeader.Version}");
-
-            var requestAsList = await requestStream.ToListAsync();
+            Logger.Trace($"FunctionRequestHeader.FunctionId String : {(FunctionConstant)functionRequestHeader.FunctionId}");
 
             switch (functionRequestHeader.FunctionId)
             {
                 case (int)FunctionConstant.Add42:
                     {
-                        foreach (var bundledRows in requestAsList)
+                        while (await requestStream.MoveNext())
                         {
                             var resultBundle = new BundledRows();
-                            foreach (var row in bundledRows.Rows)
+                            foreach (var row in requestStream.Current.Rows)
                             {
                                 var resultRow = new Row();
                                 resultRow.Duals.Add(new Dual { NumData = row.Duals[0].NumData + 42.0 });
@@ -120,19 +142,19 @@ namespace Basic_example
                             }
                             await responseStream.WriteAsync(resultBundle);
                         }
+
                         break;
                     }
                 case (int)FunctionConstant.SumOfAllNumbers:
                     {
                         double sum = 0.0;
-                        foreach (var bundledRows in requestAsList)
-                        {
 
-                            foreach (var row in bundledRows.Rows)
+                        while (await requestStream.MoveNext())
+                        {
+                            foreach (var row in requestStream.Current.Rows)
                             {
                                 sum = sum + row.Duals.Select(d => d.NumData).Sum();
                             }
-
                         }
 
                         var resultBundle = new BundledRows();
@@ -142,35 +164,107 @@ namespace Basic_example
                         await responseStream.WriteAsync(resultBundle);
                         break;
                     }
-                case (int)FunctionConstant.SmartGuessDate:
-                {
-                    foreach (var bundledRows in requestAsList)
+                case (int)FunctionConstant.ParseDateForLanguage:
                     {
-                        var resultBundle = new BundledRows();
-                        foreach (var row in bundledRows.Rows)
+                        while (await requestStream.MoveNext())
                         {
-                            var dateStringParam = row.Duals[0].StrData;
-                            var cultureParam = row.Duals[1].StrData;
+                            var resultBundle = new BundledRows();
+                            foreach (var row in requestStream.Current.Rows)
+                            {
+                                var dateStringParam = row.Duals[0].StrData;
+                                var cultureParam = row.Duals[1].StrData;
 
-                            var guessedDate =
-                                CultureGuessingDateParser.DateFromStringGuessingCulture(dateStringParam, cultureParam);
+                                var guessedDate =
+                                    CultureGuessingDateParser.DateFromStringGuessingCulture(dateStringParam, cultureParam, QlikDateBeforeFirstDate);
 
-                            var resultRow = new Row();
-                            resultRow.Duals.Add(new Dual { NumData = (guessedDate-CultureGuessingDateParser.QlikDateBeforeFirstDate).Days, StrData = guessedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)});
-                            resultBundle.Rows.Add(resultRow);
+                                var resultRow = new Row();
+                                resultRow.Duals.Add(new Dual { NumData = (guessedDate - QlikDateBeforeFirstDate).Days, StrData = guessedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) });
+                                resultBundle.Rows.Add(resultRow);
+
+                                await responseStream.WriteAsync(resultBundle);
+                            }
                         }
-                        await responseStream.WriteAsync(resultBundle);
+                        break;
                     }
-                    break;
-                }
+                case (int)FunctionConstant.Concatenate:
+                    {
+                        var requestAsList = await requestStream.ToListAsync();
+
+                        var concatenatedStrings = String.Join(", ",
+                            requestAsList.SelectMany(bundledRows => bundledRows.Rows).SelectMany(row => row.Duals)
+                                .Select(dual => dual.StrData));
+
+                        var resultBundle = new BundledRows();
+                        var resultRow = new Row();
+                        resultRow.Duals.Add(new Dual { StrData = concatenatedStrings });
+                        resultBundle.Rows.Add(resultRow);
+                        await responseStream.WriteAsync(resultBundle);
+                        break;
+                    }
+                case (int)FunctionConstant.CallCounter:
+                    {
+                        var currentIncrement = Interlocked.Increment(ref _callCounter);
+
+                        while (await requestStream.MoveNext())
+                        {
+                            var resultBundle = new BundledRows();
+                            foreach (var row in requestStream.Current.Rows)
+                            {
+                                var resultRow = new Row();
+                                resultRow.Duals.Add(new Dual { NumData = currentIncrement });
+                                resultBundle.Rows.Add(resultRow);
+                            }
+                            await responseStream.WriteAsync(resultBundle);
+                        }
+                        break;
+                    }
+                case (int)FunctionConstant.CallCounterNoCache:
+                    {
+                        context.ResponseTrailers.Add("qlik-cache", "no-store");
+                        var currentIncrement = Interlocked.Increment(ref _callCounter);
+
+                        while (await requestStream.MoveNext())
+                        {
+                            var resultBundle = new BundledRows();
+                            foreach (var row in requestStream.Current.Rows)
+                            {
+                                var resultRow = new Row();
+                                resultRow.Duals.Add(new Dual { NumData = currentIncrement });
+                                resultBundle.Rows.Add(resultRow);
+                            }
+                            await responseStream.WriteAsync(resultBundle);
+                        }
+                        break;
+                    }
                 default:
                     break;
 
             }
 
-
+            Logger.Trace("-- (ExecuteFunction) --");
 
         }
+
+        private static async Task<IEnumerable<BundledRows>> RequestAsList(IAsyncStreamReader<BundledRows> requestStream)
+        {
+            var requestAsList = await requestStream.ToListAsync();
+
+            if (Logger.IsTraceEnabled)
+            {
+                Logger.Trace($"Bundled rows in request stream: {requestAsList.Count}");
+
+                int bundleIndex = 0;
+                foreach (var bundle in requestAsList)
+                {
+                    Logger.Trace($"Rows in bundle {bundleIndex}: {bundle.Rows.Count}");
+                    ++bundleIndex;
+                }
+            }
+            return requestAsList;
+
+        }
+
+        private static long _callCounter = 0;
 
         private static void TraceServerCallContext(ServerCallContext context)
         {
@@ -235,5 +329,7 @@ namespace Basic_example
                 Logger.Trace($"{authContextProperty.Name} : {loggedValue}");
             }
         }
+
+        private static readonly DateTime QlikDateBeforeFirstDate = new DateTime(1899, 12, 30);
     }
 }

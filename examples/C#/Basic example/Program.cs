@@ -22,7 +22,7 @@ namespace Basic_example
                 $"Changes to NLog config are immediately reflected in running application, unless you change the setting autoReload=\"true\".");
 
             var grpcHost = Convert.ToString(Properties.Settings.Default.grpcHost ?? "localhost");
-            int grpcPort = Convert.ToInt32(Properties.Settings.Default.grpcPort ?? "50051");
+            int grpcPort = Convert.ToInt32(Properties.Settings.Default.grpcPort ?? "50054");
 
             var certificateFolderFullPath = Convert.ToString(Properties.Settings.Default.certificateFolderFullPath ?? "");
 
@@ -65,9 +65,11 @@ namespace Basic_example
 
             server.Start();
             Logger.Info($"gRPC listening on port {grpcPort}");
-            Logger.Info("Press Enter to stop gRPC server and exit...");
-            Console.ReadLine();
-            server?.ShutdownAsync().Wait();
+
+            Logger.Info("Press any key to stop gRPC server and exit...");
+
+            Console.ReadKey();
+            server.ShutdownAsync().Wait();
 
         }
     }

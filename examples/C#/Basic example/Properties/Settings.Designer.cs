@@ -25,7 +25,7 @@ namespace Basic_example.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50051")]
+        [global::System.Configuration.DefaultSettingValueAttribute("50054")]
         public string grpcPort {
             get {
                 return ((string)(this["grpcPort"]));

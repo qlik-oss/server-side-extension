@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="grpcPort" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">50051</Value>
+      <Value Profile="(Default)">50054</Value>
     </Setting>
     <Setting Name="grpcHost" Type="System.String" Scope="Application">
       <Value Profile="(Default)">localhost</Value>

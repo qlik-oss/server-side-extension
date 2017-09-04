@@ -67,7 +67,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="BasicExampleConnector.cs" />
-    <Compile Include="CultureGuessingDateParser.cs" />
+    <Compile Include="Functionality to expose\CultureGuessingDateParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protobuf generated\ServerSideExtension.cs" />

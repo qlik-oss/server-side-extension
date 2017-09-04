@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Basic_example
+namespace Basic_example.Functionality_to_expose
 {
     class CultureGuessingDateParser
     {
-        public static readonly DateTime QlikDateBeforeFirstDate = new DateTime(1899, 12, 30);
-
-        public static DateTime DateFromStringGuessingCulture(string dateString, string cultureIndicator)
+        public static DateTime DateFromStringGuessingCulture(string dateString, string cultureIndicator, DateTime defaultDate)
         {
             var allCultures = CultureInfo.GetCultures(CultureTypes.AllCultures).Select(cultureInfo => new
             {
                 CultureInfo = cultureInfo,
                 EnglishName = cultureInfo.EnglishName.ToLowerInvariant(),
-                NativeName = cultureInfo.NativeName.ToLowerInvariant()
+                NativeName = cultureInfo.NativeName.ToLowerInvariant(),
+                TwoLetterIsoLanguage=cultureInfo.ThreeLetterISOLanguageName,
+                ThreeLetterIsoLanguage = cultureInfo.TwoLetterISOLanguageName
             }).ToArray();
 
 
@@ -28,17 +26,25 @@ namespace Basic_example
             CultureInfo bestFitCulture = null;
             if (!alreadySelectedCultures.TryGetValue(cultureIndicatorSearchString, out bestFitCulture))
             {
-                bestFitCulture = allCultures[0].CultureInfo;
-                var bestScore =
-                    Math.Min((int)ComputeLevenshteinDistance(cultureIndicatorSearchString, allCultures[0].EnglishName),
-                        (int)ComputeLevenshteinDistance(cultureIndicatorSearchString, allCultures[0].NativeName));
 
+                Func<string, string, string, string, int> testFunction =
+                    (englishName, nativeName, threeLetterIso, twoLetterIso) => Math.Min(Math.Min(
+                            (int) ComputeLevenshteinDistance(cultureIndicatorSearchString, englishName),
+                            (int) ComputeLevenshteinDistance(cultureIndicatorSearchString, nativeName)),
+                        cultureIndicatorSearchString == threeLetterIso
+                        || cultureIndicatorSearchString == twoLetterIso
+                            ? 0
+                            : 999);
+                    
+                bestFitCulture = allCultures[0].CultureInfo;
+                var bestScore = testFunction(allCultures[0].EnglishName, allCultures[0].NativeName,
+                    allCultures[0].ThreeLetterIsoLanguage, allCultures[0].TwoLetterIsoLanguage);
+                
                 for (int cultureIndex = 1; cultureIndex < allCultures.Length; ++cultureIndex)
                 {
                     var candidate = allCultures[cultureIndex];
-                    var score =
-                        Math.Min((int)ComputeLevenshteinDistance(cultureIndicatorSearchString, candidate.EnglishName),
-                            (int)ComputeLevenshteinDistance(cultureIndicatorSearchString, candidate.NativeName));
+                    var score = testFunction(candidate.EnglishName, candidate.NativeName,
+                        candidate.ThreeLetterIsoLanguage, candidate.TwoLetterIsoLanguage);
 
                     if (score < bestScore)
                     {
@@ -63,7 +69,7 @@ namespace Basic_example
             }
             else
             {
-                return QlikDateBeforeFirstDate;
+                return defaultDate;
             }
 
         }
