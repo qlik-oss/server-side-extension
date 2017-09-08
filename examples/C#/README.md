@@ -41,6 +41,7 @@ The GetCapabilities method just returns a static Capabilities object.
 
 ### ExecuteFunction method
 The ExecuteFunction method switches over the numeric function identifier sent in the qlik-functionrequestheader-bin header. Each case statement then iterates over the BundledRows elements packed into the request stream and writes the results to the output stream.
+
 Note that ExecuteFunction is an async method and that the await keyword is used with the asynchronous functions for reading and writing stream data. These asynchronous constructs aim at keeping the I/O operations non-blocking to allow gRPC to use the available thread pool as efficiently as possible. 
 The exception is Concatenate, which uses the gRPC library's build-in function ToListAsync. This function is also asynchronous but will first read all available data, then concatenate it and finally write out the result.
 
