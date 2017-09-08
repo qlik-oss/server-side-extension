@@ -11,7 +11,7 @@ General background information is found here:
 * [RPC methods](#rpc-methods)
     * [GetCapabilities method](#getcapabilities-method)
     * [ExecuteFunction method](#executefunction-method)
-
+* ["Intelligent" functionality](#intelligent-functionality)
 
 There is currently only one sample plugin for C#.
 It demonstrates how to implement aggregate and scalar functions, and how to declare them in the return value of GetCapabilities.
@@ -40,9 +40,11 @@ The RPC methods are GetCapabilities and ExecuteFunction. There is no script supp
 The GetCapabilities method just returns a static Capabilities object.
 
 ### ExecuteFunction method
-The ExecuteFunction method switches over the numeric function identifier sent in the qlik-functionrequestheader-bin header. Each case statement then iterates over the BundledRows elements packed into the request stream and writes the results to the output stream.
+The ExecuteFunction method switches over the numeric function identifier sent in the qlik-functionrequestheader-bin header. Each case construct then iterates over the BundledRows elements packed into the request stream and writes the results to the output stream. In most cases, the operations performed are so simple that all work is done inside the case construct.
 
 Note that ExecuteFunction is an async method and that the await keyword is used with the asynchronous functions for reading and writing stream data. These asynchronous constructs aim at keeping the I/O operations non-blocking to allow gRPC to use the available thread pool as efficiently as possible. 
 The exception is Concatenate, which uses the gRPC library's build-in function ToListAsync. This function is also asynchronous but will first read all available data, then concatenate it and finally write out the result.
 
+### "Intelligent" functionality - ParseDateForLanguage
 
+The basic example contains very simple "intelligent" functionality, which is implemented inside the folder Functionality to expose. The SSE function ParseDateForLanguage will parse a date string according to the language indicated in a language string. This function was added for the fun of it, but also to give an example of where to draw the line concerning functionality that should NOT be put inside the switch statement of ExecuteFunction.
