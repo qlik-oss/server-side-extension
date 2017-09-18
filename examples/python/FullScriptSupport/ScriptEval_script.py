@@ -1,13 +1,12 @@
 import logging
 import logging.config
 
+import ServerSideExtension_pb2 as SSE
 import grpc
-import numpy as np
+import numpy
 from SSEData_script import ArgType, \
                            FunctionType, \
                            ReturnType
-
-import ServerSideExtension_pb2 as SSE
 
 
 class ScriptEval:
@@ -169,7 +168,8 @@ class ScriptEval:
         :return: a RowData of string dual
         """
         # Evaluate script
-        result = eval(script, {'args': params, 'np': np})
+        print(params)
+        result = eval(script, {'args': params, 'numpy': numpy})
 
         # Transform the result to an iterable of Dual data
         if ret_type == ReturnType.String:
