@@ -1,5 +1,4 @@
 import qlik.sse.ServerSideExtension;
-//import io.grpc.*;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerInterceptor;
@@ -12,15 +11,12 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.net.URL;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 public class PluginServer {
 
@@ -35,7 +31,8 @@ public class PluginServer {
         .intercept(new ServerInterceptor() {
             @Override
             public <RequestT,ResponseT>ServerCall.Listener<RequestT> interceptCall(
-            ServerCall<RequestT,ResponseT> serverCall, Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
+                ServerCall<RequestT,ResponseT> serverCall, Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
+                logger.finer("Intercepting call to get metadata.");
                 PluginServer.this.metadata = metadata;
                 return serverCallHandler.startCall(new SimpleForwardingServerCall<RequestT,ResponseT>(serverCall){}, metadata);
             }
@@ -46,7 +43,7 @@ public class PluginServer {
     
     public void start() throws IOException {
         server.start();
-        logger.info("Server started, listening on " + port);
+        logger.info("Server started, listening on " + port + ".");
         Runtime.getRuntime().addShutdownHook(new Thread() { //So that the server is stopped when someone press ctr-c. Hopefully good idéa?
             @Override
             public void run() {
@@ -73,24 +70,53 @@ public class PluginServer {
         public void getCapabilities(qlik.sse.ServerSideExtension.Empty request,
             io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.Capabilities> responseObserver) {
             
+            logger.fine("getCapabilities called.");
+            
             ServerSideExtension.Capabilities pluginCapabilities = ServerSideExtension.Capabilities.newBuilder()
                 .setAllowScript(true)
                 .setPluginIdentifier("Qlik java plugin")
                 .setPluginVersion("v1.0.0")
                 .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
-                    .setName("functionZero")
+                    .setName("HelloWorld")
                     .setFunctionId(0)
-                    .setFunctionType(ServerSideExtension.FunctionType.SCALAR)
+                    .setFunctionType(ServerSideExtension.FunctionType.TENSOR)
+                    .setReturnType(ServerSideExtension.DataType.STRING)
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("str1")
+                        .setDataType(ServerSideExtension.DataType.STRING)))
+                .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
+                    .setName("SumOfRows")
+                    .setFunctionId(1)
+                    .setFunctionType(ServerSideExtension.FunctionType.TENSOR)
                     .setReturnType(ServerSideExtension.DataType.NUMERIC)
                     .addParams(ServerSideExtension.Parameter.newBuilder()
-                        .setName("param1")
+                        .setName("col1")
+                        .setDataType(ServerSideExtension.DataType.NUMERIC))
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("col2")
                         .setDataType(ServerSideExtension.DataType.NUMERIC)))
+                .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
+                    .setName("SumOfColumn")
+                    .setFunctionId(2)
+                    .setFunctionType(ServerSideExtension.FunctionType.AGGREGATION)
+                    .setReturnType(ServerSideExtension.DataType.NUMERIC)
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("column")
+                        .setDataType(ServerSideExtension.DataType.NUMERIC)))
+                .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
+                    .setName("StringAggregation")
+                    .setFunctionId(3)
+                    .setFunctionType(ServerSideExtension.FunctionType.AGGREGATION)
+                    .setReturnType(ServerSideExtension.DataType.STRING)
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("columnOfStrings")
+                        .setDataType(ServerSideExtension.DataType.STRING)))
                 .build();
                 
             //addFunctions
             responseObserver.onNext(pluginCapabilities);
             responseObserver.onCompleted();
-            logger.info("getCapabilities called.");
+            logger.fine("getCapabilities completed.");
         }
         
         //responseObserver is not declared as final in example but compiler gives error otherwise
@@ -98,115 +124,182 @@ public class PluginServer {
         public io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> executeFunction(
             final io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> responseObserver) {
 
+            logger.fine("executeFunction called.");
             final qlik.sse.ServerSideExtension.FunctionRequestHeader header;
             
             try {
                 header = qlik.sse.ServerSideExtension.FunctionRequestHeader
                 .parseFrom(metadata.get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER)));
-                logger.info("Function nbr " + header.getFunctionId() + " was called.");
+                logger.fine("Function nbr " + header.getFunctionId() + " was called.");
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception when trying to get the function request header.");
-                PluginServer.this.stop(); //Should probably do this in another way.
-                return responseObserver; //Because the compiler stops complaining. Only works because this row is never executed.
+                logger.log(Level.WARNING, "Exception when trying to get the function request header.", e);
+                responseObserver.onError(new Throwable("Exception when trying to get the function request header in executeFunction."));
+                responseObserver.onCompleted();
+                return responseObserver;
             }
             
             final ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
-            
+            final List<Double> columnSum = new ArrayList();
+            final StringBuilder stringBuilder = new StringBuilder();
             
             return new io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows>() {
                 
                 @Override
                 public void onNext(qlik.sse.ServerSideExtension.BundledRows bundledRows) {
+                    logger.fine("onNext in executeFunction called.");
                     if(header != null) {
                         switch(header.getFunctionId()) {
-                            case 0:  builder.addAllRows(function0(header, bundledRows).getRowsList());
+                            case 0:  responseObserver.onNext(helloWorld(bundledRows));
+                                     break;
+                            case 1:  responseObserver.onNext(sumOfRows(bundledRows));
+                                     break;
+                            case 2:  columnSum.add(sumOfColumn(bundledRows));
+                                     break;
+                            case 3:  stringBuilder.append(stringAggregation(bundledRows));
                                      break;
                             default: logger.log(Level.WARNING, "Incorrect function id.");
+                                     responseObserver.onError(new Throwable("Incorrect function id in onNext in executeFunction."));
+                                     responseObserver.onCompleted();
                                      break;
                         }
+                    } else {
+                        logger.log(Level.WARNING, "The function request header is null.");
+                        responseObserver.onError(new Throwable("The function request header is null in on next in executeFunction."));
+                        responseObserver.onCompleted();
                     }
-                    //Do something
+                    logger.fine("onNext in executeFunction completed.");
                 }
                 
                 @Override
                 public void onError(Throwable t) {
-                    logger.log(Level.WARNING, "Encountered error in executeFunction", t);
+                    logger.log(Level.WARNING, "Encountered error in executeFunction.", t);
                 }
                 
                 @Override
                 public void onCompleted() {
-                    responseObserver.onNext(builder.build()); //Do something more?
+                    logger.fine("onCompleted in executeFunction called.");
+                    switch(header.getFunctionId()) {
+                        case 2: responseObserver.onNext(builder.addRows(ServerSideExtension.Row.newBuilder().addDuals(ServerSideExtension.Dual.newBuilder().setNumData(sum(columnSum)))).build());
+                            break;
+                        case 3: responseObserver.onNext(builder.addRows(ServerSideExtension.Row.newBuilder().addDuals(ServerSideExtension.Dual.newBuilder().setStrData(stringBuilder.toString()))).build());
+                            break;
+                        default:
+                            break;
+                    }
                     responseObserver.onCompleted();
+                    logger.fine("onCompleted in executeFunction completed.");
                 }
             };
         }
+        
+        private double sum(List<Double> list) {
+            logger.finer("sum(List<Double>) called.");
+            double sum = 0;
+            for(double d : list) {
+                sum += d;
+            }
+            logger.finer("sum(List<Double>) completed with sum: " + sum + ".");
+            return sum;
+        }
     
-        private ServerSideExtension.BundledRows function0(ServerSideExtension.FunctionRequestHeader header, ServerSideExtension.BundledRows bundledRows){
-            logger.info("This is function 0 (Not yet implemented).");
+        private ServerSideExtension.BundledRows helloWorld(ServerSideExtension.BundledRows bundledRows){
+            logger.fine("helloWorld called (and completed).");
             return bundledRows;
+        }
+        
+        private ServerSideExtension.BundledRows sumOfRows(ServerSideExtension.BundledRows bundledRows) {
+            logger.fine("Function SumOfRows called.");
+            ServerSideExtension.BundledRows.Builder result = ServerSideExtension.BundledRows.newBuilder();
+            ServerSideExtension.Row.Builder rowBuilder;
+            ServerSideExtension.Dual.Builder dualBuilder;
+            double rowSum;
+            for(ServerSideExtension.Row row : bundledRows.getRowsList()) {
+                rowBuilder = ServerSideExtension.Row.newBuilder();
+                dualBuilder = ServerSideExtension.Dual.newBuilder();
+                rowSum = 0;
+                for(ServerSideExtension.Dual dual : row.getDualsList()) {
+                    rowSum +=dual.getNumData(); 
+                }
+                result.addRows(rowBuilder.addDuals(dualBuilder.setNumData(rowSum)));
+            }
+            logger.fine("Function SumOfRows completed.");
+            return result.build();
+        }
+        
+        private double sumOfColumn(ServerSideExtension.BundledRows bundledRows) {
+            logger.fine("Function SumOfColumn called.");
+            double columnSum = 0;
+            for(ServerSideExtension.Row row : bundledRows.getRowsList()) {
+                columnSum += row.getDuals(0).getNumData();
+            }
+            logger.fine("Function SumOfColumn completed.");
+            return columnSum;
+        }
+        
+        private String stringAggregation(ServerSideExtension.BundledRows bundledRows) {
+            logger.fine("Function StringAggregation called.");
+            StringBuilder builder = new StringBuilder();
+            for(ServerSideExtension.Row row : bundledRows.getRowsList()) {
+                builder.append(row.getDuals(0).getStrData());
+            }
+            logger.fine("Function StringAggregation completed.");
+            return builder.toString();
         }
     
         public io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> evaluateScript(
             final io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> responseObserver) {
             
+            logger.fine("evaluateScript called");
             final ServerSideExtension.ScriptRequestHeader header;
             
             try {
                 header = qlik.sse.ServerSideExtension.ScriptRequestHeader
                 .parseFrom(metadata.get(Metadata.Key.of("qlik-scriptrequestheader-bin", BINARY_BYTE_MARSHALLER)));
-                logger.info("Evaluate script was called.");
+                logger.fine("Evaluate script was called.");
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Exception when trying to get the script request header.");
-                PluginServer.this.stop(); //Should probably do this in another way.
-                return responseObserver; //Because the compiler stops complaining. Only works because this row is never executed.
+                logger.log(Level.WARNING, "Exception when trying to get the script request header.", e);
+                responseObserver.onError(new Throwable("Exception when trying to get the script request header in evaluateScript."));
+                responseObserver.onCompleted();
+                return responseObserver;
             }
             
-            final ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
-            final ServerSideExtension.Row.Builder rowBuilder = ServerSideExtension.Row.newBuilder();
-            final ServerSideExtension.Dual.Builder dualBuilder = ServerSideExtension.Dual.newBuilder();
+            //final ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
             //&& header.getFunctionType()==ServerSideExtension.FunctionType.SCALAR
             if(header != null ) {
                 
                 if(header.getParamsCount()==0) {
-                    ScriptEngineManager manager = new ScriptEngineManager();
-                    ScriptEngine engine = manager.getEngineByName("JavaScript");
-                    String result;
-                    try {
-                        Object res = engine.eval(header.getScript());
-                        result = res.toString();
-                    } catch (Exception e) {
-                        logger.log(Level.WARNING, "eval script did not work");
-                        e.printStackTrace();
-                        PluginServer.this.stop();
-                        return responseObserver;
-                    }
-                    
-                    if(header.getReturnType()==ServerSideExtension.DataType.NUMERIC) {
-                        logger.info("Numeric with 0 params");
-                        builder.addRows(rowBuilder.addDuals(dualBuilder.setNumData(Double.parseDouble(result))));
-                    } else if(header.getReturnType()==ServerSideExtension.DataType.STRING){
-                        logger.info("String with 0 params");
-                        builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(result)));
-                    } else if(header.getReturnType()==ServerSideExtension.DataType.DUAL){
-                        logger.info("Dual with 0 params");
-                        builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(result).setNumData(Double.parseDouble(result))));
+                    ServerSideExtension.BundledRows result = evalScript(header);
+                    if(result.getRowsCount()>0) {
+                        responseObserver.onNext(result);
                     } else {
-                        logger.log(Level.WARNING, "Wrong return type in evaluate script.");
-                        PluginServer.this.stop();
-                        return responseObserver;
+                        responseObserver.onError(new Throwable("An error occured in evalScript in evaluateScript."));
                     }
-                    responseObserver.onNext(builder.build());
                     responseObserver.onCompleted();
+                    logger.fine("evaluateScript completed");
                 }
+            } else {
+                logger.log(Level.WARNING, "The script request header is null.");
+                responseObserver.onError(new Throwable("The script request header is null in evaluateScript."));
+                responseObserver.onCompleted();
             }
             
             return new io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows>() {
                 
                 @Override
                 public void onNext(ServerSideExtension.BundledRows bundledRows) {
-                    logger.info("On next was called");
+                    logger.fine("onNext in evaluateScript called");
                     if(header != null) {
-                        builder.mergeFrom(evalScript(header, bundledRows));
+                        ServerSideExtension.BundledRows result = evalScript(header, bundledRows);
+                        if(result.getRowsCount()>0) {
+                            responseObserver.onNext(result);
+                            logger.fine("onNext in evaluateScript completed");
+                        } else {
+                            responseObserver.onError(new Throwable("An error occured in evalScript in evaluateScript."));
+                        }
+                    } else {
+                        logger.log(Level.WARNING, "The script request header is null.");
+                        responseObserver.onError(new Throwable("The script request header is null in onNext in evaluateScript."));
+                        responseObserver.onCompleted();
                     }
                 }
                 
@@ -217,13 +310,52 @@ public class PluginServer {
                 
                 @Override
                 public void onCompleted() {
-                    responseObserver.onNext(builder.build()); //Do something more?
+                    logger.fine("onCompleted in evaluateScript called");
                     responseObserver.onCompleted();
+                    logger.fine("onCompleted in evaluateScript completed");
                 }
             };
         }
         
+        private ServerSideExtension.BundledRows evalScript(ServerSideExtension.ScriptRequestHeader header) {
+            
+            logger.fine("evalScript called");
+            ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("JavaScript");
+            String result;
+            try {
+                Object res = engine.eval(header.getScript());
+                result = res.toString();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "eval script did not work.", e);
+                return builder.build();
+            }
+            
+            ServerSideExtension.Row.Builder rowBuilder = ServerSideExtension.Row.newBuilder();
+            ServerSideExtension.Dual.Builder dualBuilder = ServerSideExtension.Dual.newBuilder();
+            
+            switch (header.getReturnType()) {
+                case STRING : 
+                    builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(result)));
+                    break;
+                case NUMERIC : 
+                    builder.addRows(rowBuilder.addDuals(dualBuilder.setNumData(Double.parseDouble(result))));
+                    break;
+                case DUAL : 
+                    builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(result).setNumData(Double.parseDouble(result))));
+                    break;
+                default :
+                    logger.log(Level.WARNING, "Incorrect return type.");
+                    return builder.build();
+            }
+            logger.fine("evalScript completed");
+            return builder.build();
+        }
+        
         private ServerSideExtension.BundledRows evalScript(ServerSideExtension.ScriptRequestHeader header, ServerSideExtension.BundledRows bundledRows) {
+            
+            logger.fine("evalScript called");
             ScriptEngineManager manager = new ScriptEngineManager();
             ScriptEngine engine = manager.getEngineByName("JavaScript");
             int nbrOfParams = header.getParamsCount();
@@ -242,9 +374,7 @@ public class PluginServer {
                     res = engine.eval(header.getScript());
                     result = res.toString();
                 } catch (Exception e) {
-                    logger.log(Level.WARNING, "eval script did not work");
-                    e.printStackTrace();
-                    PluginServer.this.stop();
+                    logger.log(Level.WARNING, "eval script did not work.", e);
                     return bundledRowsBuilder.build();
                 }
                 switch (header.getReturnType()) {
@@ -258,12 +388,12 @@ public class PluginServer {
                         bundledRowsBuilder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(result).setNumData(Double.parseDouble(result))));
                         break;
                     default :
-                        logger.log(Level.WARNING, "Incorrect return type");
-                        PluginServer.this.stop();
+                        logger.log(Level.WARNING, "Incorrect return type.");
                         return bundledRowsBuilder.build();
                 }
                 
             }
+            logger.fine("evalScript completed");
             return bundledRowsBuilder.build();
         }
     }
