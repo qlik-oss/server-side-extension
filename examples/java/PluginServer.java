@@ -6,6 +6,7 @@ import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
 import io.grpc.Metadata;
 import static io.grpc.Metadata.BINARY_BYTE_MARSHALLER;
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,16 +27,29 @@ public class PluginServer {
     private final Server server;
     private Metadata metadata;
     
-    public PluginServer(int port) throws IOException { //Somethig more here?
+    public PluginServer(int port) throws IOException {
         this.port = port;
         server = ServerBuilder.forPort(port).addService(new JavaPlugin())
         .intercept(new ServerInterceptor() {
             @Override
             public <RequestT,ResponseT>ServerCall.Listener<RequestT> interceptCall(
-                ServerCall<RequestT,ResponseT> serverCall, Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
+                ServerCall<RequestT,ResponseT> serverCall, final Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
                 logger.finer("Intercepting call to get metadata.");
                 PluginServer.this.metadata = metadata;
-                return serverCallHandler.startCall(new SimpleForwardingServerCall<RequestT,ResponseT>(serverCall){}, metadata);
+                return serverCallHandler.startCall(new SimpleForwardingServerCall<RequestT,ResponseT>(serverCall){
+                    @Override
+                    public void sendHeaders(Metadata responseHeaders) {
+                        try {
+                            ServerSideExtension.FunctionRequestHeader header = ServerSideExtension.FunctionRequestHeader
+                            .parseFrom(metadata.get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER))); //Java 8
+                            if(header.getFunctionId()==5) {
+                                String value = "no-store";
+                                responseHeaders.put(Metadata.Key.of("qlik-cache", ASCII_STRING_MARSHALLER),value);
+                            }
+                        } catch(Exception e) {}
+                        super.sendHeaders(responseHeaders);
+                    }
+                }, metadata);
             }
         })
         .build();
@@ -70,7 +85,7 @@ public class PluginServer {
         public void getCapabilities(qlik.sse.ServerSideExtension.Empty request,
             io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.Capabilities> responseObserver) {
             
-            logger.fine("getCapabilities called.");
+            logger.info("getCapabilities called.");
             
             ServerSideExtension.Capabilities pluginCapabilities = ServerSideExtension.Capabilities.newBuilder()
                 .setAllowScript(true)
@@ -111,6 +126,22 @@ public class PluginServer {
                     .addParams(ServerSideExtension.Parameter.newBuilder()
                         .setName("columnOfStrings")
                         .setDataType(ServerSideExtension.DataType.STRING)))
+                .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
+                    .setName("Cache")
+                    .setFunctionId(4)
+                    .setFunctionType(ServerSideExtension.FunctionType.TENSOR)
+                    .setReturnType(ServerSideExtension.DataType.STRING)
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("columnOfStrings")
+                        .setDataType(ServerSideExtension.DataType.STRING)))
+                .addFunctions(ServerSideExtension.FunctionDefinition.newBuilder()
+                    .setName("NoCache")
+                    .setFunctionId(5)
+                    .setFunctionType(ServerSideExtension.FunctionType.TENSOR)
+                    .setReturnType(ServerSideExtension.DataType.STRING)
+                    .addParams(ServerSideExtension.Parameter.newBuilder()
+                        .setName("columnOfStrings")
+                        .setDataType(ServerSideExtension.DataType.STRING)))
                 .build();
                 
             //addFunctions
@@ -119,16 +150,15 @@ public class PluginServer {
             logger.fine("getCapabilities completed.");
         }
         
-        //responseObserver is not declared as final in example but compiler gives error otherwise
         @Override
         public io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> executeFunction(
             final io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> responseObserver) {
 
             logger.fine("executeFunction called.");
-            final qlik.sse.ServerSideExtension.FunctionRequestHeader header;
+            final ServerSideExtension.FunctionRequestHeader header;
             
             try {
-                header = qlik.sse.ServerSideExtension.FunctionRequestHeader
+                header = ServerSideExtension.FunctionRequestHeader
                 .parseFrom(metadata.get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER)));
                 logger.fine("Function nbr " + header.getFunctionId() + " was called.");
             } catch (Exception e) {
@@ -137,6 +167,7 @@ public class PluginServer {
                 responseObserver.onCompleted();
                 return responseObserver;
             }
+            logger.info("executeFunction called. Function Id: " + header.getFunctionId() + ".");
             
             final ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
             final List<Double> columnSum = new ArrayList();
@@ -156,6 +187,10 @@ public class PluginServer {
                             case 2:  columnSum.add(sumOfColumn(bundledRows));
                                      break;
                             case 3:  stringBuilder.append(stringAggregation(bundledRows));
+                                     break;
+                            case 4:  responseObserver.onNext(cache(bundledRows));
+                                     break;
+                            case 5:  responseObserver.onNext(noCache(bundledRows));
                                      break;
                             default: logger.log(Level.WARNING, "Incorrect function id.");
                                      responseObserver.onError(new Throwable("Incorrect function id in onNext in executeFunction."));
@@ -245,11 +280,46 @@ public class PluginServer {
             logger.fine("Function StringAggregation completed.");
             return builder.toString();
         }
+        
+        private ServerSideExtension.BundledRows cache(ServerSideExtension.BundledRows bundledRows) {
+            logger.fine("Function Cache called.");
+            ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
+            ServerSideExtension.Row.Builder rowBuilder;
+            ServerSideExtension.Dual.Builder dualBuilder;
+            
+            for(ServerSideExtension.Row row : bundledRows.getRowsList()) {
+                StringBuilder strBuilder = new StringBuilder();
+                strBuilder.append(row.getDuals(0).getStrData()).append("___").append(new Date().toString());
+                rowBuilder = ServerSideExtension.Row.newBuilder();
+                dualBuilder = ServerSideExtension.Dual.newBuilder();
+                builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(strBuilder.toString())));
+            }
+            logger.fine("Function Cache completed.");
+            return builder.build();
+        }
+        
+        private ServerSideExtension.BundledRows noCache(ServerSideExtension.BundledRows bundledRows) {
+            logger.fine("Function NoCache called.");
+            
+            ServerSideExtension.BundledRows.Builder builder = ServerSideExtension.BundledRows.newBuilder();
+            ServerSideExtension.Row.Builder rowBuilder;
+            ServerSideExtension.Dual.Builder dualBuilder;
+            
+            for(ServerSideExtension.Row row : bundledRows.getRowsList()) {
+                StringBuilder strBuilder = new StringBuilder();
+                strBuilder.append(row.getDuals(0).getStrData()).append("___").append(new Date().toString());
+                rowBuilder = ServerSideExtension.Row.newBuilder();
+                dualBuilder = ServerSideExtension.Dual.newBuilder();
+                builder.addRows(rowBuilder.addDuals(dualBuilder.setStrData(strBuilder.toString())));
+            }
+            logger.fine("Function NoCache completed.");
+            return builder.build();
+        }
     
         public io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> evaluateScript(
             final io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> responseObserver) {
             
-            logger.fine("evaluateScript called");
+            logger.info("evaluateScript called");
             final ServerSideExtension.ScriptRequestHeader header;
             
             try {
@@ -289,6 +359,10 @@ public class PluginServer {
                 public void onNext(ServerSideExtension.BundledRows bundledRows) {
                     logger.fine("onNext in evaluateScript called");
                     if(header != null) {
+                        if(header.getFunctionType()==ServerSideExtension.FunctionType.AGGREGATION) {
+                            logger.log(Level.WARNING, "Aggregation is not implemented in evaluate script.");
+                            responseObserver.onCompleted();
+                        }
                         ServerSideExtension.BundledRows result = evalScript(header, bundledRows);
                         if(result.getRowsCount()>0) {
                             responseObserver.onNext(result);
@@ -399,7 +473,17 @@ public class PluginServer {
     }
 	
     public static void main(String[] args) throws Exception {
-        PluginServer server = new PluginServer(50071); //Get port from args, check if secure or unsecure connection, ServerCallInterceptor
+        int port = 50071;
+        for(int i = 0; i<args.length-1; i+=2) {
+            if(args[i].equals("--port")) {
+                try {
+                    port = Integer.parseInt(args[i+1]);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Invalid port, using default value: " + port);
+                }
+            }
+        }
+        PluginServer server = new PluginServer(port); //Get port from args, check if secure or unsecure connection, ServerCallInterceptor
         server.start();
         server.blockUntilShutdown(); //??? Needed to keep the server running
         return;
