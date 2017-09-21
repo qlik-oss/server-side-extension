@@ -8,16 +8,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Basic_example.Properties {
+namespace Basic_example {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    internal sealed partial class GrpcSettings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        private static GrpcSettings defaultInstance = ((GrpcSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new GrpcSettings())));
         
-        public static Settings Default {
+        public static GrpcSettings Default {
             get {
                 return defaultInstance;
             }
@@ -26,9 +26,9 @@ namespace Basic_example.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50054")]
-        public string grpcPort {
+        public int grpcPort {
             get {
-                return ((string)(this["grpcPort"]));
+                return ((int)(this["grpcPort"]));
             }
         }
         
@@ -44,9 +44,9 @@ namespace Basic_example.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string certificateFolderFullPath {
+        public string certificateFolder {
             get {
-                return ((string)(this["certificateFolderFullPath"]));
+                return ((string)(this["certificateFolder"]));
             }
         }
     }

@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Basic_example.Functionality_to_expose;
 using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Core.Utils;
@@ -28,7 +27,6 @@ namespace Basic_example
         {
             Add42,
             SumOfAllNumbers,
-            ParseDateForLanguage,
             Concatenate,
             CallCounter,
             CallCounterNoCache
@@ -54,13 +52,6 @@ namespace Basic_example
                     Name = "SumOfAllNumbers",
                     Params = {new Parameter {Name = "SingleNumericColumn", DataType = DataType.Numeric} },
                     ReturnType = DataType.Numeric
-                },
-                new FunctionDefinition {
-                    FunctionId = (int)FunctionConstant.ParseDateForLanguage,
-                    FunctionType = FunctionType.Scalar,
-                    Name = "ParseDateForLanguage",
-                    Params = {new Parameter {Name = "DateString", DataType = DataType.String}, new Parameter {Name = "CultureString", DataType = DataType.String} },
-                    ReturnType = DataType.Dual
                 },
                 new FunctionDefinition {
                     FunctionId = (int)FunctionConstant.Concatenate,
@@ -162,28 +153,6 @@ namespace Basic_example
                         resultRow.Duals.Add(new Dual { NumData = sum });
                         resultBundle.Rows.Add(resultRow);
                         await responseStream.WriteAsync(resultBundle);
-                        break;
-                    }
-                case (int)FunctionConstant.ParseDateForLanguage:
-                    {
-                        while (await requestStream.MoveNext())
-                        {
-                            var resultBundle = new BundledRows();
-                            foreach (var row in requestStream.Current.Rows)
-                            {
-                                var dateStringParam = row.Duals[0].StrData;
-                                var cultureParam = row.Duals[1].StrData;
-
-                                var guessedDate =
-                                    CultureGuessingDateParser.DateFromStringGuessingCulture(dateStringParam, cultureParam, QlikDateBeforeFirstDate);
-
-                                var resultRow = new Row();
-                                resultRow.Duals.Add(new Dual { NumData = (guessedDate - QlikDateBeforeFirstDate).Days, StrData = guessedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) });
-                                resultBundle.Rows.Add(resultRow);
-
-                                await responseStream.WriteAsync(resultBundle);
-                            }
-                        }
                         break;
                     }
                 case (int)FunctionConstant.Concatenate:
