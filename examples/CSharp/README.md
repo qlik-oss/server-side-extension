@@ -11,10 +11,10 @@ General background information is found here:
 ### Configuration file settings
 
 There are three settings in the configuration file. If you change these settings, the example program has to be restarted for new settings to take effect.
-#### Basic example.exe.config settings for grpcHost and grpcPort
+#### BasicExample.exe.config settings for grpcHost and grpcPort
 These constitute the address of the gRPC server.
 
-#### Basic example.exe.config setting for certificateFolder
+#### BasicExample.exe.config setting for certificateFolder
 The certificate folder is where the server expects to find the public key to the root certificate and server certificate, along with the private key for the server certificate.
 See the guide for [Generating certificates](../../generate_certs_guide/README.md) for more information on how to create and configure certificates.
 
@@ -40,13 +40,13 @@ RPC methods are implemented in the connector class BasicExampleConnnector.
 
 ## Implementing a server - Protobuf generated files
 The interface between the Qlik Engine acting as a client and the Server-side extension acting as server is defined in 
-the file [ServerSideExtension.proto](../../proto/ServerSideExtension.proto). The Basic example C# project references the Grpc.Tools Nuget package 
+the file [ServerSideExtension.proto](../../proto/ServerSideExtension.proto). The BasicExample C# project references the Grpc.Tools Nuget package 
 which contains the Protobuf compiler protoc.exe and a plug-in for generating gRPC code in C#.
 
 When the C# project is built, a pre-build event command line runs the protoc.exe compiler with the gRPC C# plug-in and generates the code found in the project 
-folder Protobuf generated. This generated code contains data classes that are compatible with the Protobuf serialization used by Server-side extensions, as well 
+folder ProtobufGenerated. This generated code contains data classes that are compatible with the Protobuf serialization used by Server-side extensions, as well 
 as an abstract ConnectorBase class to be overridden by our implementation of an SSE server.
-None of these generated classes are special for the Basic example project, they only depend on the interface defined for Server-side extensions in general.
+None of these generated classes are special for the BasicExample project, they only depend on the interface defined for Server-side extensions in general.
 
 ## RPC methods
 The RPC methods implemented in the Basic example are GetCapabilities and ExecuteFunction. There is no script support.

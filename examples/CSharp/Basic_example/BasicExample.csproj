@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Basic_example</RootNamespace>
-    <AssemblyName>Basic example</AssemblyName>
+    <AssemblyName>BasicExample</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -69,8 +69,8 @@
     <Compile Include="BasicExampleConnector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Protobuf generated\ServerSideExtension.cs" />
-    <Compile Include="Protobuf generated\ServerSideExtensionGrpc.cs" />
+    <Compile Include="ProtobufGenerated\ServerSideExtension.cs" />
+    <Compile Include="ProtobufGenerated\ServerSideExtensionGrpc.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -97,7 +97,7 @@
   <PropertyGroup>
     <PreBuildEvent>set TOOLS_DIR="$(ProjectDir)packages\Grpc.Tools.1.4.1\tools\windows_x64"
 set PROTO_DIR="$(ProjectDir)..\..\..\proto"
-set OUT_DIR="$(ProjectDir)Protobuf generated"
+set OUT_DIR="$(ProjectDir)ProtobufGenerated"
 %25TOOLS_DIR%25\protoc -I%25PROTO_DIR%25 --grpc_out=%25OUT_DIR%25 --csharp_out=%25OUT_DIR%25 --plugin=protoc-gen-grpc=%25TOOLS_DIR%25\grpc_csharp_plugin.exe %25PROTO_DIR%25\ServerSideExtension.proto
 exit /b %25ERRORLEVEL%25</PreBuildEvent>
   </PropertyGroup>

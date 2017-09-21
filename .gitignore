@@ -11,3 +11,4 @@ packages
 *.VC.db
 *.VC.opendb
 Protobuf generated
+/examples/CSharp/Basic_example/ProtobufGenerated/
