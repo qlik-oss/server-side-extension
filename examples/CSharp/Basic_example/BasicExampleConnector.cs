@@ -214,24 +214,6 @@ namespace Basic_example
 
         }
 
-        private static async Task<IEnumerable<BundledRows>> RequestAsList(IAsyncStreamReader<BundledRows> requestStream)
-        {
-            var requestAsList = await requestStream.ToListAsync();
-
-            if (Logger.IsTraceEnabled)
-            {
-                Logger.Trace($"Bundled rows in request stream: {requestAsList.Count}");
-
-                int bundleIndex = 0;
-                foreach (var bundle in requestAsList)
-                {
-                    Logger.Trace($"Rows in bundle {bundleIndex}: {bundle.Rows.Count}");
-                    ++bundleIndex;
-                }
-            }
-            return requestAsList;
-
-        }
 
         private static long _callCounter = 0;
 
@@ -299,6 +281,5 @@ namespace Basic_example
             }
         }
 
-        private static readonly DateTime QlikDateBeforeFirstDate = new DateTime(1899, 12, 30);
     }
 }
