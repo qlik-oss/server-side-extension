@@ -32,7 +32,8 @@ This repository includes documentation that describes the SSE protocol, how to u
 * [Writing an SSE Plugin using C++](examples/cpp/README.md)
 * [A basic example](examples/cpp/basic_example/README.md)
 
-### C# and SSE R-plugin
+### C#
+* [Writing an SSE Plugin using C#](examples/CSharp/README.md)
 * The [SSE R-plugin](https://github.com/qlik-oss/sse-r-plugin) is written in C#
 
 ## Contributing

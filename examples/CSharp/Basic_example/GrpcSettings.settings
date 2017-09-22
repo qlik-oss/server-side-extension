@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Basic_example" GeneratedClassName="GrpcSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="grpcPort" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">50054</Value>
+    </Setting>
+    <Setting Name="grpcHost" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="certificateFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
