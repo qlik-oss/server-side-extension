@@ -11,11 +11,19 @@ import io.grpc.ForwardingServerCall.SimpleForwardingServerCall;
 import io.grpc.stub.StreamObserver;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogManager;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.File;
 import java.net.URL;
 import java.util.Date;
+
+//import io.netty.handler.ssl.SslContextBuilder;
+import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NettyServerBuilder;
+import io.netty.handler.ssl.ClientAuth;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -23,19 +31,46 @@ import javax.script.ScriptEngineManager;
 public class PluginServer {
 
     private static final Logger logger = Logger.getLogger(PluginServer.class.getName());
+    private static final LogManager logManager = LogManager.getLogManager();
+    static {
+        try {
+            logManager.readConfiguration(new FileInputStream("./javapluginlogger.properties"));
+        } catch(IOException e) {
+            logger.info("Could not read the javapluginlogger.properties file, using default settings.");
+        }
+    }
     private final int port;
     private final Server server;
-    private Metadata metadata;
+    private ThreadLocal<Metadata> metadata = new ThreadLocal<Metadata>();
     
-    public PluginServer(int port) throws IOException {
+    public PluginServer(int port, String pemDir) throws IOException {
         this.port = port;
-        server = ServerBuilder.forPort(port).addService(new JavaPlugin())
+        ServerBuilder serverBuilder;
+        
+        if(!pemDir.isEmpty()) {
+            try {
+                //serverBuilder = NettyServerBuilder.forPort(port)
+                //    .sslContext(GrpcSslContexts
+                //        .forServer(new File(pemDir + "sse_server_cert.pem"), new File(pemDir + "sse_server_key.pk8"))
+                //        .clientAuth(ClientAuth.OPTIONAL).build());
+                serverBuilder = ServerBuilder.forPort(port).useTransportSecurity(new File(pemDir + "sse_server_cert.pem"), new File(pemDir + "sse_server_key.pk8"));
+                System.out.print("Success!");
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not create a secure connection.", e);
+                serverBuilder = ServerBuilder.forPort(port);
+            }
+            
+        } else {
+            serverBuilder = ServerBuilder.forPort(port);
+        }
+        
+        server = serverBuilder.addService(new JavaPlugin())
         .intercept(new ServerInterceptor() {
             @Override
             public <RequestT,ResponseT>ServerCall.Listener<RequestT> interceptCall(
                 ServerCall<RequestT,ResponseT> serverCall, final Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
                 logger.finer("Intercepting call to get metadata.");
-                PluginServer.this.metadata = metadata;
+                PluginServer.this.metadata.set(metadata);
                 return serverCallHandler.startCall(new SimpleForwardingServerCall<RequestT,ResponseT>(serverCall){
                     @Override
                     public void sendHeaders(Metadata responseHeaders) {
@@ -45,6 +80,9 @@ public class PluginServer {
                             if(header.getFunctionId()==5) {
                                 String value = "no-store";
                                 responseHeaders.put(Metadata.Key.of("qlik-cache", ASCII_STRING_MARSHALLER),value);
+                            } else {
+                                String value = "no-store";
+                                responseHeaders.remove(Metadata.Key.of("qlik-cache", ASCII_STRING_MARSHALLER),value);
                             }
                         } catch(Exception e) {}
                         super.sendHeaders(responseHeaders);
@@ -159,7 +197,7 @@ public class PluginServer {
             
             try {
                 header = ServerSideExtension.FunctionRequestHeader
-                .parseFrom(metadata.get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER)));
+                .parseFrom(metadata.get().get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER)));
                 logger.fine("Function nbr " + header.getFunctionId() + " was called.");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Exception when trying to get the function request header.", e);
@@ -316,6 +354,7 @@ public class PluginServer {
             return builder.build();
         }
     
+        @Override
         public io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> evaluateScript(
             final io.grpc.stub.StreamObserver<qlik.sse.ServerSideExtension.BundledRows> responseObserver) {
             
@@ -324,8 +363,8 @@ public class PluginServer {
             
             try {
                 header = qlik.sse.ServerSideExtension.ScriptRequestHeader
-                .parseFrom(metadata.get(Metadata.Key.of("qlik-scriptrequestheader-bin", BINARY_BYTE_MARSHALLER)));
-                logger.fine("Evaluate script was called.");
+                .parseFrom(metadata.get().get(Metadata.Key.of("qlik-scriptrequestheader-bin", BINARY_BYTE_MARSHALLER)));
+                logger.fine("Got the script request header.");
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Exception when trying to get the script request header.", e);
                 responseObserver.onError(new Throwable("Exception when trying to get the script request header in evaluateScript."));
@@ -401,6 +440,7 @@ public class PluginServer {
             try {
                 Object res = engine.eval(header.getScript());
                 result = res.toString();
+                logger.finer("The string representation of the result: " + result);
             } catch (Exception e) {
                 logger.log(Level.WARNING, "eval script did not work.", e);
                 return builder.build();
@@ -471,9 +511,10 @@ public class PluginServer {
             return bundledRowsBuilder.build();
         }
     }
-	
+
     public static void main(String[] args) throws Exception {
         int port = 50071;
+        String pemDir = "";
         for(int i = 0; i<args.length-1; i+=2) {
             if(args[i].equals("--port")) {
                 try {
@@ -481,11 +522,14 @@ public class PluginServer {
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Invalid port, using default value: " + port);
                 }
+            } else if (args[i].equals("--pemDir")) {
+                pemDir = args[i+1];
             }
+            
         }
-        PluginServer server = new PluginServer(port); //Get port from args, check if secure or unsecure connection, ServerCallInterceptor
+        PluginServer server = new PluginServer(port, pemDir); //check if secure or unsecure connection
         server.start();
-        server.blockUntilShutdown(); //??? Needed to keep the server running
+        server.blockUntilShutdown(); 
         return;
         
     }
