@@ -14,16 +14,12 @@ import java.util.logging.Logger;
 import java.util.logging.LogManager;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.Date;
-
-//import io.netty.handler.ssl.SslContextBuilder;
-import io.grpc.netty.GrpcSslContexts;
-import io.grpc.netty.NettyServerBuilder;
-import io.netty.handler.ssl.ClientAuth;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -49,12 +45,8 @@ public class PluginServer {
         
         if(!pemDir.isEmpty()) {
             try {
-                //serverBuilder = NettyServerBuilder.forPort(port)
-                //    .sslContext(GrpcSslContexts
-                //        .forServer(new File(pemDir + "sse_server_cert.pem"), new File(pemDir + "sse_server_key.pk8"))
-                //        .clientAuth(ClientAuth.OPTIONAL).build());
-                serverBuilder = ServerBuilder.forPort(port).useTransportSecurity(new File(pemDir + "sse_server_cert.pem"), new File(pemDir + "sse_server_key.pk8"));
-                System.out.print("Success!");
+                serverBuilder = ServerBuilder.forPort(port)
+                .useTransportSecurity(new File(pemDir + "sse_server_cert.pem"), new File(pemDir + "sse_server_key.pk8"));
             } catch (Exception e) {
                 logger.log(Level.WARNING, "Could not create a secure connection.", e);
                 serverBuilder = ServerBuilder.forPort(port);
@@ -71,12 +63,16 @@ public class PluginServer {
                 ServerCall<RequestT,ResponseT> serverCall, final Metadata metadata, ServerCallHandler<RequestT,ResponseT> serverCallHandler) {
                 logger.finer("Intercepting call to get metadata.");
                 PluginServer.this.metadata.set(metadata);
+                logHeader(metadata);
                 return serverCallHandler.startCall(new SimpleForwardingServerCall<RequestT,ResponseT>(serverCall){
                     @Override
                     public void sendHeaders(Metadata responseHeaders) {
+                        logger.finest("Send headers.");
                         try {
                             ServerSideExtension.FunctionRequestHeader header = ServerSideExtension.FunctionRequestHeader
                             .parseFrom(metadata.get(Metadata.Key.of("qlik-functionrequestheader-bin", BINARY_BYTE_MARSHALLER))); //Java 8
+                            logger.finest("Function request header.");
+                            logHeader(responseHeaders); //Java 8
                             if(header.getFunctionId()==5) {
                                 String value = "no-store";
                                 responseHeaders.put(Metadata.Key.of("qlik-cache", ASCII_STRING_MARSHALLER),value);
@@ -89,6 +85,19 @@ public class PluginServer {
                     }
                 }, metadata);
             }
+            
+            private void logHeader(Metadata header) {
+                Set<String> keys = header.keys();
+                logger.finest("Is header empty? " + keys.isEmpty());
+                for(String key : keys) {
+                    if(key.toLowerCase().contains("-bin")) {
+                        logger.finest("Key: "+ key + " Value: " + header.get(Metadata.Key.of(key, BINARY_BYTE_MARSHALLER)));
+                    } else {
+                        logger.finest("Key: "+ key + " Value: " + header.get(Metadata.Key.of(key, ASCII_STRING_MARSHALLER)));
+                    }
+                    
+                }
+            }
         })
         .build();
     }
@@ -97,7 +106,7 @@ public class PluginServer {
     public void start() throws IOException {
         server.start();
         logger.info("Server started, listening on " + port + ".");
-        Runtime.getRuntime().addShutdownHook(new Thread() { //So that the server is stopped when someone press ctr-c. Hopefully good idéa?
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 PluginServer.this.stop();
@@ -113,7 +122,7 @@ public class PluginServer {
     
     private void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
-            server.awaitTermination(); //So that the program is not shut down?
+            server.awaitTermination();
         }
     }
 
@@ -181,8 +190,7 @@ public class PluginServer {
                         .setName("columnOfStrings")
                         .setDataType(ServerSideExtension.DataType.STRING)))
                 .build();
-                
-            //addFunctions
+            
             responseObserver.onNext(pluginCapabilities);
             responseObserver.onCompleted();
             logger.fine("getCapabilities completed.");
@@ -246,6 +254,7 @@ public class PluginServer {
                 @Override
                 public void onError(Throwable t) {
                     logger.log(Level.WARNING, "Encountered error in executeFunction.", t);
+                    responseObserver.onCompleted();
                 }
                 
                 @Override
@@ -419,6 +428,7 @@ public class PluginServer {
                 @Override
                 public void onError(Throwable t) {
                     logger.log(Level.WARNING, "Encountered error in evaluateScript", t);
+                    responseObserver.onCompleted();
                 }
                 
                 @Override
@@ -527,7 +537,7 @@ public class PluginServer {
             }
             
         }
-        PluginServer server = new PluginServer(port, pemDir); //check if secure or unsecure connection
+        PluginServer server = new PluginServer(port, pemDir);
         server.start();
         server.blockUntilShutdown(); 
         return;
