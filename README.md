@@ -36,5 +36,9 @@ This repository includes documentation that describes the SSE protocol, how to u
 * [Writing an SSE Plugin using C#](examples/CSharp/README.md)
 * The [SSE R-plugin](https://github.com/qlik-oss/sse-r-plugin) is written in C#
 
+### Java
+* [A basic Java example](examples/java/basic_example/README.md)
+* [Writing an SSE plugin using Java](examples/java/basic_example/WritingAnSSEPluginUsingJava.md)
+
 ## Contributing
 Please follow the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
