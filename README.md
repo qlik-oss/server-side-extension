@@ -40,5 +40,9 @@ This repository includes documentation that describes the SSE protocol, how to u
 * [A basic Java example](examples/java/basic_example/README.md)
 * [Writing an SSE plugin using Java](examples/java/basic_example/WritingAnSSEPluginUsingJava.md)
 
+### Go
+* [A basic Go example](examples/go/basic_example/README.md)
+* [Writing an SSE Plugin using Go](examples/go/README.md)
+
 ## Contributing
 Please follow the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).

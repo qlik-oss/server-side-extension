@@ -2,6 +2,7 @@
 *.o
 *.pb.cc
 *.pb.h
+*.pb.go
 *.suo
 *.csproj.user
 *.DotSettings.user
