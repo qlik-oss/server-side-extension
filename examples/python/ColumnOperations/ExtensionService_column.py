@@ -251,7 +251,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', nargs='?', default='50053')
     parser.add_argument('--pem_dir', nargs='?')
-    parser.add_argument('--definition-file', nargs='?', default='FuncDefs_column.json')
+    parser.add_argument('--definition_file', nargs='?', default='FuncDefs_column.json')
     args = parser.parse_args()
 
     # need to locate the file when script is called from outside it's location dir.
