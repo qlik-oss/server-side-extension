@@ -11,10 +11,10 @@
  - In a command prompt, execute: *go get -u github.com/golang/protobuf/protoc-gen-go*
 (note that the [*protoc-gen-go*](https://github.com/golang/protobuf#installation) program also needs to be in your %PATH%).
 
- - In a command prompt, execute: *go get github.com/qlikmats/server-side-extension/examples/go/basic_example*
+ - In a command prompt, execute: *go get github.com/qlik-oss/server-side-extension/examples/go/basic_example*
 (you will get an "error" saying there are no go files in the \gen folder, but that's  fine - we will generate a file in that folder in the following step).
 
- - From your Go SSE plugin folder (i.e. %GOPATH%\src\github.com\qlikmats\server-side-extension\examples\go\basic_example), execute: *go generate*
+ - From your Go SSE plugin folder (i.e. %GOPATH%\src\github.com\qlik-oss\server-side-extension\examples\go\basic_example), execute: *go generate*
 (this will generate the gRPC/Protobuf file(s) that your server will use  for implementing the qlik.sse.Connector service).
 
 
