@@ -18,8 +18,8 @@ These constitute the address of the gRPC server.
 The certificate folder is where the server expects to find the public key to the root certificate and server certificate, along with the private key for the server certificate.
 See the guide for [Generating certificates](../../generate_certs_guide/README.md) for more information on how to create and configure certificates.
 
-### Configuring QlikSense to use the sample gRPC server
-By default, the C# sample plug-in runs on port 50054 on localhost, so for a QlikSense Desktop installation, the following should be added to settings.ini:
+### Configuring Qlik to use the sample gRPC server
+By default, the C# sample plug-in runs on port 50054 on localhost, so for a Qlik installation, the following should be added to settings.ini:
 
 [Settings 7] 
 

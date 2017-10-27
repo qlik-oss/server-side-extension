@@ -234,7 +234,7 @@ def _cache(request, context):
 ```
 
 ### `NoCache` function
-If for some reason you need to update the result each time you make a selection, you can disable the cache by setting the `qlik-cache` variable to 'no-store' in the header. Except for setting the header, the function is exactly the same as the `Cache` function described above. In the resulting Sense document you will notice that the date-time stamp is updated every time you change your selections.
+If for some reason you need to update the result each time you make a selection, you can disable the cache by setting the `qlik-cache` variable to 'no-store' in the header. Except for setting the header, the function is exactly the same as the `Cache` function described above. In the resulting Qlik document you will notice that the date-time stamp is updated every time you change your selections.
 
 ```python
 @staticmethod
