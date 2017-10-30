@@ -7,7 +7,7 @@ In this example we cover some basic calculations and support for different funct
 * [Defined functions](#defined-functions)
     * [`SumOfRows` function](#sumofrows-function)
     * [`SumOfColumn` function](#sumofcolumn-function)
-* [Sense document](#sense-document)
+* [Qlik documents](#qlik-documents)
 * [Run the example!](#run-the-example)
 
 ## Script evaluation
@@ -206,8 +206,8 @@ The second function is an aggregation and sums the values in a column. We iterat
         yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
 ```
 
-## Sense document
-There are are two sheets in this example. One contains script calls and the other contains user defined function calls. We demonstrate a tensor function, which sums two columns row-wise, and an aggregating function, which sums all rows in a column returning a single value. The data loaded in the Data Load Editor are two fields, *A* and *B*, each of which contain five numeric values.
+## Qlik documents
+An example document is given for Qlik Sense (SSE_Column_Operations.qvf) and QlikView (SSE_Column_Operations.qvw). There are are two sheets in this example. One contains script calls and the other contains user defined function calls. We demonstrate a tensor function, which sums two columns row-wise, and an aggregating function, which sums all rows in a column returning a single value. The data loaded in the Data Load Editor are two fields, *A* and *B*, each of which contain five numeric values.
 
 The aggregating script function is called with the expression `Column.ScriptAggr('sum(args[0])', A)`, where `'sum(args[0])'` is the script and `A` is the data field. The script returns a single value when evaluated. The second script call is `Column.ScriptEval('args[0]+args[1]',A,B)` with the script `'args[0]+args[1]'` adding the two parameters `A` and `B` row-wise. The result is an array with five values, each a sum of the  corresponding values in `A` and `B`.
 

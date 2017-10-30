@@ -4,7 +4,7 @@ This example plugin includes support for all script functionality.
 ## Content
 * [Script evaluation](#script-evaluation)
     * [Implementation](#implementation)
-* [Sense Document](#sense-document)
+* [Qlik Documents](#qlik-documents)
     * [Load script](#load-script)
     * [Chart expressions](#chart-expressions)
 * [Run the Example!](#run-the-example)
@@ -152,18 +152,18 @@ class ScriptEval:
 ```
 
 
-## Sense document
-This section describes the SSE calls in the Sense document. The explanation covers the load-script and chart expressions separately. The section on chart expressions also describes the different sheets.
+## Qlik documents
+This section describes the SSE calls in the Qlik documents. An example document is given for Qlik Sense (SSE_Full_Script_Support.qvf) and QlikView (SSE_Full_Script_Support.qvw). The explanation covers the load-script and chart expressions separately. The section on chart expressions also describes the different sheets.
 
 ### Load script
-Three tables are loaded into Qlik Sense, _Table1_, _SSELoad_ and _SSELoadAggr_. _Table1_ consists of three columns of data: __ID__, __String__ and __Mixed__. The __String__ and __Mixed__ columns refer to the data types of the values they contain. The __ID__ column is used as a key between _Table1_ and _SSELoad_. The __Numeric__ column in _SSELoad_ is loaded by an SSE expression: `Script.ScriptEval('args[0] + 1', ID)`. The script evaluated in the plugin is `'args[0] + 1'` and adds a one to each row of the given parameter __ID__.
+Three tables are loaded into the Qlik engine, _Table1_, _SSELoad_ and _SSELoadAggr_. _Table1_ consists of three columns of data: __ID__, __String__ and __Mixed__. The __String__ and __Mixed__ columns refer to the data types of the values they contain. The __ID__ column is used as a key between _Table1_ and _SSELoad_. The __Numeric__ column in _SSELoad_ is loaded by an SSE expression: `Script.ScriptEval('args[0] + 1', ID)`. The script evaluated in the plugin is `'args[0] + 1'` and adds a one to each row of the given parameter __ID__.
 
 Note that SSE calls in the load-script are currently limited to the scalar function and aggregation function types. This implies that there is one call to the plugin per row of data returned. For example the __Numeric__ field is interpreted as scalar and will result in four calls to the plugin. An aggregation call on the other hand results in a single call since we are returning only one value, independently of how many rows any given parameter has.
 
 The third table _SSELoadAggr_ contains a single value in the field __TotalCount__, which is loaded by an aggregation call to the SSE plugin. The syntax used here is `Script.ScriptAggr('len(args[0])', ID)` where `'len(args[0])'`is the script executed, returning the length of the __ID__ field sent as the first, and only, parameter.
 
 ### Chart expressions
-The Sense document consists of six sheets, one providing no parameters, one describing the SSE calls from load script, and the rest are based on specific data types (numeric, string and dual).
+The Qlik document consists of six sheets, one providing no parameters, one describing the SSE calls from load script, and the rest are based on specific data types (numeric, string and dual).
 
 The first sheet demonstrates running scripts with no parameters. This is likely not a common use case, and because we do not send any parameters, only a single value can be returned. In the top KPI object we use `Script.ScriptEvalStr('"The answer to the Ultimate Question of Life, the Universe, and Everything"')` to return the string. Note the double pair of quotes, where the outer represents the script itself and the inner is defining the string. The second call adds two numbers: `Script.ScriptEval('40+2')`.
 
