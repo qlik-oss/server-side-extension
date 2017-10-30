@@ -1,5 +1,7 @@
 # Getting started with the Python examples
 
+If you want to use [Docker](http://www.docker.com/) to build and run the examples, here's a [quickstart](Docker.md).
+
 We provide several examples at different levels of complexity, each of which is documented separately. All examples support mutual authentication. Note that the examples do **not** necessarily support the same functionality; therefore a function call in one example might not work in another.
 
 The following table includes a short description of each example and the functionality it demonstrates.

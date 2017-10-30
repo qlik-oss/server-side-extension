@@ -1,0 +1,13 @@
+FROM grpc/python
+
+RUN pip install -U pip
+RUN pip install numpy
+
+ADD . /app
+
+WORKDIR /app
+ENTRYPOINT ["python"]
+CMD ["FullScriptSupport/ExtensionService_Script.py"]
+EXPOSE 50051
+
+
