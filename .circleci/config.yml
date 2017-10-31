@@ -1,0 +1,39 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: adreeve/python-numpy
+    working_directory: /app
+    steps:
+      - checkout
+      - run:
+          name: Install other deps (i.e. gRPC)
+          command: pip install -U pip --no-cache-dir -r ./examples/python/requirements.txt
+
+      - run:
+          name: Start FullScriptSupport plugin on port 50051
+          command: python ./examples/python/FullScriptSupport/ExtensionService_Script.py
+          background: true
+
+      - run:
+          name: Start HelloWorld plugin on port 50052
+          command: python ./examples/python/HelloWorld/ExtensionService_helloworld.py
+          background: true
+
+      - run:
+          name: Start ColumnOperations plugin on port 50053
+          command: python ./examples/python/ColumnOperations/ExtensionService_column.py
+          background: true
+
+      - run:
+          name: Wait for plugins to start
+          command: sleep 5
+
+      - run:
+          name: Nose tests
+          command: nosetests -v ./examples/python/test/test_*.py
+
+      - store_artifacts:
+          path: /app/logs
+          destination: sse-logs
+
