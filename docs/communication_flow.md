@@ -1,6 +1,6 @@
 # Communication flow
 
-The following diagram demonstrates the communication between the Qlik Sense client, the Qlik engine service, and the SSE plugin:
+The following diagram demonstrates the communication between the Qlik Sense client, the Qlik engine service, and the SSE plugin (the communication between _QlikView_ and the SSE plugin works in the same way):
 
 ![](SSE_communication_flow.png?raw=true)
 
