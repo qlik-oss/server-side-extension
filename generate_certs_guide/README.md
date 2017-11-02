@@ -37,7 +37,7 @@ If you have problems executing the script, make sure you have execute permission
 
 Do the following:
 
-1. Copy the folder named *sse_qliktest_client_certs_used_by_qlik* to the Qlik computer (the client). You must configure the SSE plugin in Qlik; make sure you refer to the file location where you copied the certificates in the __Certificate file path__ field of the __Analytic connections__ section in the QMC, or when editing the SSEPlugin setting in the settings.ini file. See [Configuring SSE plugins in Qlik](../../docs/configuration.md).
+1. Copy the folder named *sse_qliktest_client_certs_used_by_qlik* to the Qlik computer (the client). You must configure the SSE plugin in Qlik; make sure you refer to the file location where you copied the certificates in the __Certificate file path__ field of the __Analytic connections__ section in the QMC, or when editing the SSEPlugin setting in the settings.ini file. See [Configuring SSE plugins in Qlik](../docs/configuration.md).
 
 2. The SSE plugin is the server in the SSE communication, so copy and refer to the folder named *sse_qliktest_server_certs* in the plugin server.
 

@@ -8,8 +8,8 @@ This repository includes documentation that describes the SSE protocol, how to u
 [![CircleCI](https://circleci.com/gh/qlik-oss/server-side-extension.svg?style=shield)](https://circleci.com/gh/qlik-oss/server-side-extension)  
 
 **Current Plugin Version and State:** v1.0.0  
-**Matching Qlik Sense Version:** Qlik Sense 2017 release (or later). Both desktop and enterprise.
-**Matching QlikView Version:** QlikView November 2017 (or later). Both desktop and server.
+**Matching Qlik Sense Version:** Qlik Sense 2017 release (or later). Both desktop and enterprise.  
+**Matching QlikView Version:** QlikView November 2017 (or later). Both desktop and server.  
 **Examples:** The examples provided are not meant to be used in production, therefore **no support is provided**.  
 
 [Previous Versions](docs/versions.md)
