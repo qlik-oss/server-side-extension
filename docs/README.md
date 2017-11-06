@@ -28,7 +28,4 @@ The order of the data sent to the SSE plugin may not be the same as the order yo
 * **Recovering lost connection**  
 If the connection to the plugin is lost, the Qlik engine attempts to reconnect after 20 seconds by default. You can configure a different timeout interval in QMC.
 
-* **New log file**  
-You will see a new type of log file in the Qlik Sense engine logs and the QlikView Server logs containing SSE-specific information.
-
 For more information, see [Limitations](limitations.md).
