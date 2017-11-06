@@ -8,9 +8,9 @@ This repository includes documentation that describes the SSE protocol, how to u
 [![CircleCI](https://circleci.com/gh/qlik-oss/server-side-extension.svg?style=shield)](https://circleci.com/gh/qlik-oss/server-side-extension)  
 
 **Current Plugin Version and State:** v1.0.0  
-**Matching Qlik Sense Version:** Qlik Sense 2017 release (or later). Both desktop and enterprise.  
+**Matching Qlik Sense Version:** Qlik Sense June 2017 release (or later). Both desktop and enterprise.  
 **Matching QlikView Version:** QlikView November 2017 (or later). Both desktop and server.  
-**Examples:** The examples provided are not meant to be used in production, therefore **no support is provided**.  
+**Examples Disclaimer:** The examples provided are just examples, therefore **use them at your own risk**.  
 
 [Previous Versions](docs/versions.md)
 
@@ -18,7 +18,7 @@ This repository includes documentation that describes the SSE protocol, how to u
 
 * [Overview](docs/README.md)
 * [Communication flow](docs/communication_flow.md)
-* [Generating certificates](generate_certs_guide/README.md)
+* [Generating certificates for secure connection](generate_certs_guide/README.md)
 * [Configuring SSE plugins in Qlik Sense and QlikView](docs/configuration.md)
 * [Writing an SSE plugin](docs/writing_a_plugin.md)
 * [Protocol Documentation](docs/SSE_Protocol.md) (API reference)
