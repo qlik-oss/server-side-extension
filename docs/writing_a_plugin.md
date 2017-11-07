@@ -1,16 +1,16 @@
 # Writing an SSE plugin
 
-This section assumes you have read [Communication Flow](../docs/communication_flow.md) to get an understanding of the communication between the Qlik Sense client, the Qlik Sense engine service, and the SSE plugin.  
+This section assumes you have read [Communication Flow](../docs/communication_flow.md) to get an understanding of the communication between the Qlik client, the Qlik engine, and the SSE plugin.  
 
 There are three possible RPC calls to the plugin from the engine.  
 
 * `GetCapabilities`: called when Engine starts, returns the capabilities of the plugin.  
-* `EvaluateScript`: called when a script function is used in the Sense client.  
-* `ExecuteFunction`: called when a plugin function is used in the Sense client.  
+* `EvaluateScript`: called when a script function is used in the Qlik client.  
+* `ExecuteFunction`: called when a plugin function is used in the Qlik client.  
 
 But what is the difference between a _script function_ and a _plugin function_?  
 
-In short, the difference lies in where the script to be executed is written. For script functions you write any script directly in the Qlik Sense client, and pass it as a parameter to the SSE plugin in one of the many pre-defined script functions. The plugin functions, on the other hand, are defined and implemented on the plugin side. The user calls the function directly by name and inserts the data as parameters in the Qlik Sense client. The two options are described in detail below.
+In short, the difference lies in where the script to be executed is written. For script functions you write any script directly in the Qlik client, and pass it as a parameter to the SSE plugin in one of the many pre-defined script functions. The plugin functions, on the other hand, are defined and implemented on the plugin side. The user calls the function directly by name and inserts the data as parameters in the Qlik client. The two options are described in detail below.
 
 ## Script evaluation
 When script evaluation is enabled, eight script functions are automatically added to the functionality of the plugin, so the function definitions are therefore already set. What should be covered on the plugin side to fullfil the functionality is the implementation of the `EvaluateScript` RPC function, including fetching the parameter values, running the script and returning the result in the correct format.
@@ -33,7 +33,7 @@ where:
 * `<EngineName>` :  The mapping/alias to the plugin, as defined in *settings.ini* or in QMC
 * `<FunctionName>` : The name of the function.
 * `<Script>`: A string containing the script to be evaluated.
-* `<Parameter>`: Additional parameters containing data from Qlik Sense. Multiple parameters are comma separated.
+* `<Parameter>`: Additional parameters containing data from Qlik. Multiple parameters are comma separated.
 
 The next four functions have `dual` as parameter type, that is, we can have arguments of different data types: `string`, `numeric`, or `dual`. However, the return type must be either `string` or `numeric`. Use cases for these functions could be text analysis and clustering, where number of clusters (numeric) is one parameter and the text data another (string).
 
@@ -70,7 +70,7 @@ where:
 * `<FunctionName>`: The name of the function sent in `GetCapabilities`
 * `<Parameter>`: The function parameter(s). Depending on the definition, there could be multiple parameters of different types. Multiple parameters are comma separated.
 
-Remember that Qlik Sense only takes the first column of data sent back from the plugin; if there are more they are ignored. Read more about *function types* in the API reference, [Protocol Documentation](SSE_Protocol.md).
+Remember that Qlik only takes the first column of data sent back from the plugin; if there are more they are ignored. Read more about *function types* in the API reference, [Protocol Documentation](SSE_Protocol.md).
 
 ## Implementation
 The implementation of the plugin is language-dependent. We have provided examples for some languages (see the */examples* folder for more information). However, there are some things to remember independently of the language you choose.
@@ -81,7 +81,7 @@ The definition of each script function is added on the engine side, and your imp
 When a script function is called from the UI, the engine calls the `EvaluateScript` RPC method in your plugin. It is up to you as a developer to decide how to implement the support for the different script functions. One option is to have a specific implementation for each script function and then map the call from `EvaluteScript` to the appropriate one. Because there is a lot of repetitive code in this case, in the Python examples we have chosen to have the same methods for all script functions that handle all supported data types and function types.
 
 ### The `ExecuteFunction` RPC method
-When the client (i.e., Qlik Sense) calls the RPC method `GetCapabilities`, the plugin must return the function definitions. This lets Sense know about the function capabilities for this specific plugin. Each function definition includes its **function name**, the **number of parameters** and their **types**, the **return type**, as well as **function type**. The function name is restricted to include alpha-numeric and underscore characters only.
+When the client (e.g., Qlik Sense) calls the RPC method `GetCapabilities`, the plugin must return the function definitions. This lets the Qlik engine know about the function capabilities for this specific plugin. Each function definition includes its **function name**, the **number of parameters** and their **types**, the **return type**, as well as **function type**. The function name is restricted to include alpha-numeric and underscore characters only.
 
 When a function call is made from the UI, the engine calls the `ExecuteFunction` RPC method in your plugin. This method must delegate the call to the correct implementation of your functions. In the Python examples, we use the `getattr()` method and a dictionary that maps the function ID (which is sent in the request header) to the implemented function name. For more information, see [Writing an SSE plugin using Python](../examples/python/README.md).
 
@@ -90,7 +90,7 @@ The default behavior of the Qlik engine is to cache results from computations in
 
 Caching is automatically turned off as well if a request fails due to the communication failure or an exception is raised during a call.
 
-## Using SSE plugin expressions in a Qlik Sense document
+## Using SSE plugin expressions in a Qlik document
 
 It is possible to make an SSE call from the load script or from a chart expression. The syntax of the call is the same regardless of where you choose to use it.
 
@@ -99,4 +99,4 @@ Note that SSE expressions in the load-script only support scalar and aggregation
 You will find sample code demonstrating an SSE plugin expression in the load-script in the [Full script support](../examples/python/FullScriptSupport/README.md) example written in Python.
 
 ### Sort Order
-Note that the sort order in the visualizations is not necessarily the same as the order sent to the plugin. It is up to you as a developer to preserve the order when you return the values from the plugin to the Qlik Sense client.
+Note that the sort order in the visualizations is not necessarily the same as the order sent to the plugin. It is up to you as a developer to preserve the order when you return the values from the plugin to the Qlik client.

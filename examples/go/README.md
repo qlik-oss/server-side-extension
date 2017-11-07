@@ -20,7 +20,7 @@ The GetCapabilities method returns a Capabilities object, describing the operati
 The ExecuteFunction method switches over the numeric function identifier sent in the *qlik-functionrequestheader-bin* header. 
 Each case construct then iterates over the BundledRows elements packed into the request stream and writes the results to the output stream.  There are five functions implemented in the Go example plugin:
 
- - *EchoString* (echoes the supplied string back to Sense)
+ - *EchoString* (echoes the supplied string back to Qlik)
  - *SumOfRow* (summarizes two columns, in a row-wise manner)
  - *SumOfColumn* (summarizes  one column)
  - *Cache* (example of SSE caching)

@@ -9,7 +9,7 @@ This example demonstrates some very simple functionality of the SSE protocol. Fo
     * [`HelloWorldAggr` function](#helloworldaggr-function)
     * [`Cache` function](#cache-function)
     * [ `NoCache` function](#nocache-function)
-* [Sense document](#sense-document)
+* [Qlik documents](#qlik-documents)
 * [Run the example!](#run-the-example)
 
 ## Script evaluation
@@ -234,7 +234,7 @@ def _cache(request, context):
 ```
 
 ### `NoCache` function
-If for some reason you need to update the result each time you make a selection, you can disable the cache by setting the `qlik-cache` variable to 'no-store' in the header. Except for setting the header, the function is exactly the same as the `Cache` function described above. In the resulting Sense document you will notice that the date-time stamp is updated every time you change your selections.
+If for some reason you need to update the result each time you make a selection, you can disable the cache by setting the `qlik-cache` variable to 'no-store' in the header. Except for setting the header, the function is exactly the same as the `Cache` function described above. In the resulting Qlik document you will notice that the date-time stamp is updated every time you change your selections.
 
 ```python
 @staticmethod
@@ -260,8 +260,8 @@ def _no_cache(request, context):
             yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
 ```
 
-## Sense document
-The Sense document consists of three sheets, one with script function calls and two with user defined function calls. The function calls on each of the first two sheets demonstrate the same functionality. We use a table for the tensor call and a KPI object for the aggregation call. On the third sheet we demonstrate enabling and disabling the cache for a specific function. A field called __HelloWorldData__ consisting of two rows of strings is loaded into the Sense client.
+## Qlik documents
+An example document is given for Qlik Sense (SSE_Hello_World.qvf) and QlikView (SSE_Hello_World.qvw). The example consists of three sheets, one with script function calls and two with user defined function calls. The function calls on each of the first two sheets demonstrate the same functionality. We use a table for the tensor call and a KPI object for the aggregation call. On the third sheet we demonstrate enabling and disabling the cache for a specific function. A field called __HelloWorldData__ consisting of two rows of strings is loaded into the Qlik engine.
 
 For the user defined functions we use the expressions `HelloWorld.HelloWorld(HelloWorldData)`, `HelloWorld.HelloWorldAggr(HelloWorldData)`, `HelloWorld.Cache(HelloWorldData)` and `HelloWorld.NoCache(HelloWorldData)`. The calls are straightforward, with the data field sent as a parameter to each function.
 

@@ -7,7 +7,7 @@ If you've not already read [Writing an SSE Plugin using C++](../README.md) and f
 
 If the example was compiled successfully there should be an executable file in the same folder as the source code. The program has one optional command line argument `--pem_dir <dir/of/pem/and/key/>` which should be used to run the plugin in secure mode.
 
-To get Qlik Sense to connect to the plugin see [Configuring SSE plugins in Qlik Sense](../../../docs/configuration.md).
+To get Qlik to connect to the plugin see [Configuring SSE plugins in Qlik](../../../docs/configuration.md).
 
 ## Implemented functionality
 

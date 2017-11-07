@@ -1,6 +1,6 @@
 # Generating certificates
 
-SSE plugins use certificates to enable a secure connection between the SSE plugins and Qlik Sense. We provide Windows and Linux scripts for generating these certificates. Use the operating system that suits you best. You only need to run the script once. These scripts generate certificates and keys to enable mutual authentication (both server authentication and client authentication). Recall that Qlik Sense acts as the client, and the SSE plugin acts as the server.
+SSE plugins use certificates to enable a secure connection between the SSE plugins and Qlik. We provide Windows and Linux scripts for generating these certificates. Use the operating system that suits you best. You only need to run the script once. These scripts generate certificates and keys to enable mutual authentication (both server authentication and client authentication). Recall that Qlik acts as the client, and the SSE plugin acts as the server.
 
 ## Prerequisites
 You must have OpenSSL installed:
@@ -37,8 +37,8 @@ If you have problems executing the script, make sure you have execute permission
 
 Do the following:
 
-1. Copy the folder named *sse_qliktest_client_certs_used_by_qlik* to the Qlik Sense computer (the client). You must configure the SSE plugin in Qlik Sense; make sure you refer to the file location where you copied the certificates in the __Certificate file path__ field of the __Analytic connections__ section in the QMC.
+1. Copy the folder named *sse_qliktest_client_certs_used_by_qlik* to the Qlik computer (the client). You must configure the SSE plugin in Qlik; make sure you refer to the file location where you copied the certificates in the __Certificate file path__ field of the __Analytic connections__ section in the QMC, or when editing the SSEPlugin setting in the settings.ini file. See [Configuring SSE plugins in Qlik](../docs/configuration.md).
 
 2. The SSE plugin is the server in the SSE communication, so copy and refer to the folder named *sse_qliktest_server_certs* in the plugin server.
 
-**Note:** Do not rename the certificate files. The client file names must be exactly as the script names them (*root_cert.pem*, *sse_client_cert.pem*, *sse_client_key.pem*), otherwise Qlik Sense (engine service) will not be able to find them.
+**Note:** Do not rename the certificate files. The client file names must be exactly as the script names them (*root_cert.pem*, *sse_client_cert.pem*, *sse_client_key.pem*), otherwise the Qlik engine will not be able to find them.

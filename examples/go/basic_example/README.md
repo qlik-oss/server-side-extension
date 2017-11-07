@@ -19,14 +19,14 @@
 
 
 
-### Configuring QlikSense to use the sample gRPC server
-By default, the Go sample plug-in runs on port 50055 on localhost, so for a QlikSense Desktop installation, the following should be added to settings.ini:
+### Configuring Qlik to use the sample gRPC server
+By default, the Go sample plug-in runs on port 50055 on localhost, so for a Qlik installation, the following should be added to settings.ini:
 
 *[Settings 7]* 
 *SSEPlugin=SSEGo, localhost:50055[,PATH_TO_CERTIFICATE_FOLDER]*
 
 Note that the string SSEGo is the identifier that will prefix all plug-in functions when they are called from within Qlik.
-Use a different identifier for your own plug-in, and remember that this exact string has to be used for your Sense applications to work with the extension.
+Use a different identifier for your own plug-in, and remember that this exact string has to be used for your Qlik applications to work with the extension.
 
 The address (localhost:50055) should of course match the address in the server's configuration file.
 

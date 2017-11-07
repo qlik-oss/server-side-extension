@@ -23,7 +23,7 @@ In general, each plugin has the following files:
 
 | __File__ | __Content__ |
 | ------ | ------ |
-| `ExtensionService_<examplename>.py` | The class `ExtensionService` containing the implementation of the RPC methods and the creation of the gRPC server. This file is the main file for the plugin and is the one that needs to be running before Qlik Sense is started.|
+| `ExtensionService_<examplename>.py` | The class `ExtensionService` containing the implementation of the RPC methods and the creation of the gRPC server. This file is the main file for the plugin and is the one that needs to be running before the Qlik engine is started.|
 | `ScriptEval_<examplename>.py` | Used for script evaluation. The class `ScriptEval` contains methods for evaluating the script, retrieving data types or arguments etc. |
 | `SSEData_<examplename>.py`| Currently used for script evaluation only. Containing class enumerates of data types and function types. |
 
@@ -48,7 +48,7 @@ Of course this is just a skeleton implementation. In the examples, you will find
 
 ## RPC methods
 
-The RPC methods are `GetCapabilities`, `ExecuteFunction`, and `EvaluateScript`. The implementation of these methods differs depending on the supported functionality for your plugin. For instance, if you only support script evaluations you do not need to implement the `ExecuteFunction` method. However, the `GetCapabilities` method is mandatory, because that is where you define and send back the supported functionality to the client, i.e., Qlik Sense.
+The RPC methods are `GetCapabilities`, `ExecuteFunction`, and `EvaluateScript`. The implementation of these methods differs depending on the supported functionality for your plugin. For instance, if you only support script evaluations you do not need to implement the `ExecuteFunction` method. However, the `GetCapabilities` method is mandatory, because that is where you define and send back the supported functionality to the client, i.e., the Qlik engine.
 
 ### `GetCapabilities` method
 The `GetCapabilities` method includes the following variables you can use to define the capabilities for your plugin:
@@ -93,7 +93,7 @@ class ExtensionExpression(SSE.ConnectiorServicer):
 ### `EvaluateScript` method
 When you enable script evaluation, several script functions are automatically added to the functionality of the plugin, as described in [Writing an SSE Plugin](../../docs/writing_a_plugin.md). The example plugins provided for Python are fairly similar to one another. The difference is the supported functionality for different data types.
 
-In example plugins with limited support, we check the function type in the `EvaluateScript` function and, depending on the answer, we either raise an "unimplemented" error or continue with our evaluation. In the example code below, we support functionality for aggregation and tensor functions. __Note__ that you must set the _status code_ in the context to be able to include the correct error code in the SSE logs from the Qlik Sense client. Otherwise the logging will show undefined error. The details including the message will also be visible in the SSE logs if set.
+In example plugins with limited support, we check the function type in the `EvaluateScript` function and, depending on the answer, we either raise an "unimplemented" error or continue with our evaluation. In the example code below, we support functionality for aggregation and tensor functions. __Note__ that you must set the _status code_ in the context to be able to include the correct error code in the SSE logs from the Qlik engine. Otherwise the logging will show undefined error. The details including the message will also be visible in the SSE logs if set.
 
 If you are interested in implementing a plugin that supports script evaluation, see the [FullScriptSupport](FullScriptSupport/README.md) example.
 
@@ -129,7 +129,7 @@ class ExtensionExpression(SSE.ConnectiorServicer):
 ```
 
 ### `ExecuteFunction` method
-When the client (i.e., Qlik Sense) calls a plugin function, the function ID is sent in a header to the server, which runs the `ExecuteFunction` method. In the examples we use a mapping between the function ID and the method name of the user defined functions (see the `functions` method in the following code example).
+When the client (i.e., the Qlik engine) calls a plugin function, the function ID is sent in a header to the server, which runs the `ExecuteFunction` method. In the examples we use a mapping between the function ID and the method name of the user defined functions (see the `functions` method in the following code example).
 
 ```python
 import ServerSideExtension_pb2 as SSE
