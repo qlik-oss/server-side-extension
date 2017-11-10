@@ -33,8 +33,7 @@ class ExtensionService(SSE.ConnectorServicer):
         """
         self._function_definitions = funcdef_file
         self.ScriptEval = ScriptEval()
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
+        os.makedirs('logs', exist_ok=True)
         log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logger.config')
         logging.config.fileConfig(log_file)
         logging.info('Logging enabled')
