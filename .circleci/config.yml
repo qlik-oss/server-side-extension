@@ -2,12 +2,12 @@ version: 2.0
 jobs:
   build:
     docker:
-      - image: adreeve/python-numpy
+      - image: python:3.5.4
     working_directory: /app
     steps:
       - checkout
       - run:
-          name: Install other deps (i.e. gRPC)
+          name: Install dependencies
           command: pip install -U pip --no-cache-dir -r ./examples/python/requirements.txt
 
       - run:
