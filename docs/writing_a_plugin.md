@@ -58,7 +58,7 @@ There are a number of reasons you might want to define your own functions instea
 * It is easier to maintain control of what end users can do with user defined functions. Allowing users to run arbitrary scripts poses a security risk. By supporting only pre-defined functions, this threat is minimized.
 * Some languages are not optimal to be used as script languages.
 * You can avoid writing duplicate scripts in the Qlik expressions when you want to perform the same operations multiple times.
-* It is easier to view and edit long scripts in separate files rather than in the expression editory or load script editor in Qlik.
+* It is easier to view and edit long scripts in separate files rather than in the expression editor or load script editor in Qlik.
 
 To call a function from the expression editor or load script in Qlik, use the following form:
 
@@ -76,7 +76,7 @@ Remember that Qlik only takes the first column of data sent back from the plugin
 The implementation of the plugins are language-dependent. We have provided examples for some languages (see the */examples* folder for more information). However, there are some things to remember independently of the language you choose.
 
 ### Protobuf generated files
-The interface between Qlik and your Server-side extension is defined in the file [ServerSideExtension.proto](../proto/ServerSideExtension.proto). For convenience, this file is used to generate the base communication source code for the language your plugin is written in and this is done by using gRPC Tools. The messages and methods in the proto file will be converted to source code used by your plugin. 
+The interface between Qlik and your Server-side extension is defined in the file [ServerSideExtension.proto](../proto/ServerSideExtension.proto). For convenience, this file is used to generate the base communication source code for the language your plugin is written in and this is done by using gRPC Tools. The messages and methods in the proto file will be compiled to source code used by your plugin. 
 
 ### RPC methods
 The RPC methods available are `GetCapabilities`, `ExecuteFunction`, and `EvaluateScript`. The implementation of these methods differs depending on the supported functionality for your plugin. For instance, if you only support script evaluations you do not need to implement the `ExecuteFunction` method. However, the `GetCapabilities` method is mandatory, because that is where you define and send back the supported functionality to the client, i.e., the Qlik engine.
