@@ -19,6 +19,14 @@ The following diagram shows an example of SSE plugins communicating with Qlik:
 This means that the server (that is, the plugin) must be started and running before the Qlik engine is started.
 
 ## Considerations
+
+* **General security attention**  
+If you allow scripts to be executed in your plugin, consider the following.
+Since scripts can be very powerful and you will never know what script will be executed by your plugin (and the script engine used) you must be extra careful to secure the machine that your plugin and the script engine are deployed to as much as you can. If possible, sandbox the execution. Be aware of which user account that is starting the plugin and script engine and what access rights this user got in the machine and in your domain to minimize any harm a malicious script can cause. 
+
+* **Secure connection using certificates**  
+Use secure connection between the plugin server and Qlik by using certificates with mutual authentication. See [Generating certificates](../generate_certs_guide/README.md) that explains how to generate proper certificates.
+
 * **Potential bottleneck**  
 SSE plugins will feel slower than the normal Qlik engine calculations that use in-memory data. SSE plugins may also become a bottleneck if massive usage is applied (many measures, many users, many apps, a lot of data), so be sure to architect your SSE deployment very carefully.
 
