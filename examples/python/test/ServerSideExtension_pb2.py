@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='ServerSideExtension.proto',
   package='qlik.sse',
   syntax='proto3',
-  serialized_pb=_b('\n\x19ServerSideExtension.proto\x12\x08qlik.sse\"\x07\n\x05\x45mpty\"?\n\tParameter\x12$\n\x08\x64\x61taType\x18\x01 \x01(\x0e\x32\x12.qlik.sse.DataType\x12\x0c\n\x04name\x18\x02 \x01(\t\"\xb1\x01\n\x12\x46unctionDefinition\x12\x0c\n\x04name\x18\x01 \x01(\t\x12,\n\x0c\x66unctionType\x18\x02 \x01(\x0e\x32\x16.qlik.sse.FunctionType\x12&\n\nreturnType\x18\x03 \x01(\x0e\x32\x12.qlik.sse.DataType\x12#\n\x06params\x18\x04 \x03(\x0b\x32\x13.qlik.sse.Parameter\x12\x12\n\nfunctionId\x18\x05 \x01(\x05\"\x85\x01\n\x0c\x43\x61pabilities\x12\x13\n\x0b\x61llowScript\x18\x01 \x01(\x08\x12/\n\tfunctions\x18\x02 \x03(\x0b\x32\x1c.qlik.sse.FunctionDefinition\x12\x18\n\x10pluginIdentifier\x18\x03 \x01(\t\x12\x15\n\rpluginVersion\x18\x04 \x01(\t\"(\n\x04\x44ual\x12\x0f\n\x07numData\x18\x01 \x01(\x01\x12\x0f\n\x07strData\x18\x02 \x01(\t\"$\n\x03Row\x12\x1d\n\x05\x64uals\x18\x01 \x03(\x0b\x32\x0e.qlik.sse.Dual\"*\n\x0b\x42undledRows\x12\x1b\n\x04rows\x18\x01 \x03(\x0b\x32\r.qlik.sse.Row\"\xa0\x01\n\x13ScriptRequestHeader\x12\x0e\n\x06script\x18\x01 \x01(\t\x12,\n\x0c\x66unctionType\x18\x02 \x01(\x0e\x32\x16.qlik.sse.FunctionType\x12&\n\nreturnType\x18\x03 \x01(\x0e\x32\x12.qlik.sse.DataType\x12#\n\x06params\x18\x04 \x03(\x0b\x32\x13.qlik.sse.Parameter\"<\n\x15\x46unctionRequestHeader\x12\x12\n\nfunctionId\x18\x01 \x01(\x05\x12\x0f\n\x07version\x18\x02 \x01(\t\"I\n\x13\x43ommonRequestHeader\x12\r\n\x05\x61ppId\x18\x01 \x01(\t\x12\x0e\n\x06userId\x18\x02 \x01(\t\x12\x13\n\x0b\x63\x61rdinality\x18\x03 \x01(\x03*-\n\x08\x44\x61taType\x12\n\n\x06STRING\x10\x00\x12\x0b\n\x07NUMERIC\x10\x01\x12\x08\n\x04\x44UAL\x10\x02*7\n\x0c\x46unctionType\x12\n\n\x06SCALAR\x10\x00\x12\x0f\n\x0b\x41GGREGATION\x10\x01\x12\n\n\x06TENSOR\x10\x02\x32\xd6\x01\n\tConnector\x12<\n\x0fGetCapabilities\x12\x0f.qlik.sse.Empty\x1a\x16.qlik.sse.Capabilities\"\x00\x12\x45\n\x0f\x45xecuteFunction\x12\x15.qlik.sse.BundledRows\x1a\x15.qlik.sse.BundledRows\"\x00(\x01\x30\x01\x12\x44\n\x0e\x45valuateScript\x12\x15.qlik.sse.BundledRows\x1a\x15.qlik.sse.BundledRows\"\x00(\x01\x30\x01\x42\x03\xf8\x01\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x19ServerSideExtension.proto\x12\x08qlik.sse\"\x07\n\x05\x45mpty\"?\n\tParameter\x12$\n\x08\x64\x61taType\x18\x01 \x01(\x0e\x32\x12.qlik.sse.DataType\x12\x0c\n\x04name\x18\x02 \x01(\t\"T\n\x10\x46ieldDescription\x12$\n\x08\x64\x61taType\x18\x01 \x01(\x0e\x32\x12.qlik.sse.DataType\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0c\n\x04tags\x18\x03 \x03(\t\"\xb1\x01\n\x12\x46unctionDefinition\x12\x0c\n\x04name\x18\x01 \x01(\t\x12,\n\x0c\x66unctionType\x18\x02 \x01(\x0e\x32\x16.qlik.sse.FunctionType\x12&\n\nreturnType\x18\x03 \x01(\x0e\x32\x12.qlik.sse.DataType\x12#\n\x06params\x18\x04 \x03(\x0b\x32\x13.qlik.sse.Parameter\x12\x12\n\nfunctionId\x18\x05 \x01(\x05\"\x85\x01\n\x0c\x43\x61pabilities\x12\x13\n\x0b\x61llowScript\x18\x01 \x01(\x08\x12/\n\tfunctions\x18\x02 \x03(\x0b\x32\x1c.qlik.sse.FunctionDefinition\x12\x18\n\x10pluginIdentifier\x18\x03 \x01(\t\x12\x15\n\rpluginVersion\x18\x04 \x01(\t\"(\n\x04\x44ual\x12\x0f\n\x07numData\x18\x01 \x01(\x01\x12\x0f\n\x07strData\x18\x02 \x01(\t\"$\n\x03Row\x12\x1d\n\x05\x64uals\x18\x01 \x03(\x0b\x32\x0e.qlik.sse.Dual\"*\n\x0b\x42undledRows\x12\x1b\n\x04rows\x18\x01 \x03(\x0b\x32\r.qlik.sse.Row\"\xa0\x01\n\x13ScriptRequestHeader\x12\x0e\n\x06script\x18\x01 \x01(\t\x12,\n\x0c\x66unctionType\x18\x02 \x01(\x0e\x32\x16.qlik.sse.FunctionType\x12&\n\nreturnType\x18\x03 \x01(\x0e\x32\x12.qlik.sse.DataType\x12#\n\x06params\x18\x04 \x03(\x0b\x32\x13.qlik.sse.Parameter\"<\n\x15\x46unctionRequestHeader\x12\x12\n\nfunctionId\x18\x01 \x01(\x05\x12\x0f\n\x07version\x18\x02 \x01(\t\"I\n\x13\x43ommonRequestHeader\x12\r\n\x05\x61ppId\x18\x01 \x01(\t\x12\x0e\n\x06userId\x18\x02 \x01(\t\x12\x13\n\x0b\x63\x61rdinality\x18\x03 \x01(\x03\"b\n\x10TableDescription\x12*\n\x06\x66ields\x18\x01 \x03(\x0b\x32\x1a.qlik.sse.FieldDescription\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x14\n\x0cnumberOfRows\x18\x03 \x01(\x03*-\n\x08\x44\x61taType\x12\n\n\x06STRING\x10\x00\x12\x0b\n\x07NUMERIC\x10\x01\x12\x08\n\x04\x44UAL\x10\x02*7\n\x0c\x46unctionType\x12\n\n\x06SCALAR\x10\x00\x12\x0f\n\x0b\x41GGREGATION\x10\x01\x12\n\n\x06TENSOR\x10\x02\x32\xd6\x01\n\tConnector\x12<\n\x0fGetCapabilities\x12\x0f.qlik.sse.Empty\x1a\x16.qlik.sse.Capabilities\"\x00\x12\x45\n\x0f\x45xecuteFunction\x12\x15.qlik.sse.BundledRows\x1a\x15.qlik.sse.BundledRows\"\x00(\x01\x30\x01\x12\x44\n\x0e\x45valuateScript\x12\x15.qlik.sse.BundledRows\x1a\x15.qlik.sse.BundledRows\"\x00(\x01\x30\x01\x42\x03\xf8\x01\x01\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -45,8 +45,8 @@ _DATATYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=853,
-  serialized_end=898,
+  serialized_start=1039,
+  serialized_end=1084,
 )
 _sym_db.RegisterEnumDescriptor(_DATATYPE)
 
@@ -72,8 +72,8 @@ _FUNCTIONTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=900,
-  serialized_end=955,
+  serialized_start=1086,
+  serialized_end=1141,
 )
 _sym_db.RegisterEnumDescriptor(_FUNCTIONTYPE)
 
@@ -149,6 +149,51 @@ _PARAMETER = _descriptor.Descriptor(
 )
 
 
+_FIELDDESCRIPTION = _descriptor.Descriptor(
+  name='FieldDescription',
+  full_name='qlik.sse.FieldDescription',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dataType', full_name='qlik.sse.FieldDescription.dataType', index=0,
+      number=1, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='qlik.sse.FieldDescription.name', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='tags', full_name='qlik.sse.FieldDescription.tags', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=113,
+  serialized_end=197,
+)
+
+
 _FUNCTIONDEFINITION = _descriptor.Descriptor(
   name='FunctionDefinition',
   full_name='qlik.sse.FunctionDefinition',
@@ -203,8 +248,8 @@ _FUNCTIONDEFINITION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=114,
-  serialized_end=291,
+  serialized_start=200,
+  serialized_end=377,
 )
 
 
@@ -255,8 +300,8 @@ _CAPABILITIES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=294,
-  serialized_end=427,
+  serialized_start=380,
+  serialized_end=513,
 )
 
 
@@ -293,8 +338,8 @@ _DUAL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=429,
-  serialized_end=469,
+  serialized_start=515,
+  serialized_end=555,
 )
 
 
@@ -324,8 +369,8 @@ _ROW = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=471,
-  serialized_end=507,
+  serialized_start=557,
+  serialized_end=593,
 )
 
 
@@ -355,8 +400,8 @@ _BUNDLEDROWS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=509,
-  serialized_end=551,
+  serialized_start=595,
+  serialized_end=637,
 )
 
 
@@ -407,8 +452,8 @@ _SCRIPTREQUESTHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=554,
-  serialized_end=714,
+  serialized_start=640,
+  serialized_end=800,
 )
 
 
@@ -445,8 +490,8 @@ _FUNCTIONREQUESTHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=716,
-  serialized_end=776,
+  serialized_start=802,
+  serialized_end=862,
 )
 
 
@@ -490,11 +535,57 @@ _COMMONREQUESTHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=778,
-  serialized_end=851,
+  serialized_start=864,
+  serialized_end=937,
+)
+
+
+_TABLEDESCRIPTION = _descriptor.Descriptor(
+  name='TableDescription',
+  full_name='qlik.sse.TableDescription',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='fields', full_name='qlik.sse.TableDescription.fields', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='qlik.sse.TableDescription.name', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='numberOfRows', full_name='qlik.sse.TableDescription.numberOfRows', index=2,
+      number=3, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=939,
+  serialized_end=1037,
 )
 
 _PARAMETER.fields_by_name['dataType'].enum_type = _DATATYPE
+_FIELDDESCRIPTION.fields_by_name['dataType'].enum_type = _DATATYPE
 _FUNCTIONDEFINITION.fields_by_name['functionType'].enum_type = _FUNCTIONTYPE
 _FUNCTIONDEFINITION.fields_by_name['returnType'].enum_type = _DATATYPE
 _FUNCTIONDEFINITION.fields_by_name['params'].message_type = _PARAMETER
@@ -504,8 +595,10 @@ _BUNDLEDROWS.fields_by_name['rows'].message_type = _ROW
 _SCRIPTREQUESTHEADER.fields_by_name['functionType'].enum_type = _FUNCTIONTYPE
 _SCRIPTREQUESTHEADER.fields_by_name['returnType'].enum_type = _DATATYPE
 _SCRIPTREQUESTHEADER.fields_by_name['params'].message_type = _PARAMETER
+_TABLEDESCRIPTION.fields_by_name['fields'].message_type = _FIELDDESCRIPTION
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 DESCRIPTOR.message_types_by_name['Parameter'] = _PARAMETER
+DESCRIPTOR.message_types_by_name['FieldDescription'] = _FIELDDESCRIPTION
 DESCRIPTOR.message_types_by_name['FunctionDefinition'] = _FUNCTIONDEFINITION
 DESCRIPTOR.message_types_by_name['Capabilities'] = _CAPABILITIES
 DESCRIPTOR.message_types_by_name['Dual'] = _DUAL
@@ -514,6 +607,7 @@ DESCRIPTOR.message_types_by_name['BundledRows'] = _BUNDLEDROWS
 DESCRIPTOR.message_types_by_name['ScriptRequestHeader'] = _SCRIPTREQUESTHEADER
 DESCRIPTOR.message_types_by_name['FunctionRequestHeader'] = _FUNCTIONREQUESTHEADER
 DESCRIPTOR.message_types_by_name['CommonRequestHeader'] = _COMMONREQUESTHEADER
+DESCRIPTOR.message_types_by_name['TableDescription'] = _TABLEDESCRIPTION
 DESCRIPTOR.enum_types_by_name['DataType'] = _DATATYPE
 DESCRIPTOR.enum_types_by_name['FunctionType'] = _FUNCTIONTYPE
 
@@ -530,6 +624,13 @@ Parameter = _reflection.GeneratedProtocolMessageType('Parameter', (_message.Mess
   # @@protoc_insertion_point(class_scope:qlik.sse.Parameter)
   ))
 _sym_db.RegisterMessage(Parameter)
+
+FieldDescription = _reflection.GeneratedProtocolMessageType('FieldDescription', (_message.Message,), dict(
+  DESCRIPTOR = _FIELDDESCRIPTION,
+  __module__ = 'ServerSideExtension_pb2'
+  # @@protoc_insertion_point(class_scope:qlik.sse.FieldDescription)
+  ))
+_sym_db.RegisterMessage(FieldDescription)
 
 FunctionDefinition = _reflection.GeneratedProtocolMessageType('FunctionDefinition', (_message.Message,), dict(
   DESCRIPTOR = _FUNCTIONDEFINITION,
@@ -587,6 +688,13 @@ CommonRequestHeader = _reflection.GeneratedProtocolMessageType('CommonRequestHea
   ))
 _sym_db.RegisterMessage(CommonRequestHeader)
 
+TableDescription = _reflection.GeneratedProtocolMessageType('TableDescription', (_message.Message,), dict(
+  DESCRIPTOR = _TABLEDESCRIPTION,
+  __module__ = 'ServerSideExtension_pb2'
+  # @@protoc_insertion_point(class_scope:qlik.sse.TableDescription)
+  ))
+_sym_db.RegisterMessage(TableDescription)
+
 
 DESCRIPTOR.has_options = True
 DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\370\001\001'))
@@ -594,15 +702,15 @@ try:
   # THESE ELEMENTS WILL BE DEPRECATED.
   # Please use the generated *_pb2_grpc.py files instead.
   import grpc
-  from grpc.framework.common import cardinality
-  from grpc.framework.interfaces.face import utilities as face_utilities
   from grpc.beta import implementations as beta_implementations
   from grpc.beta import interfaces as beta_interfaces
+  from grpc.framework.common import cardinality
+  from grpc.framework.interfaces.face import utilities as face_utilities
 
 
   class ConnectorStub(object):
     """*
-    The communication service provited between Qlik Engine and the plugin.
+    The communication service provided between the Qlik engine and the plugin.
     """
 
     def __init__(self, channel):
@@ -630,25 +738,25 @@ try:
 
   class ConnectorServicer(object):
     """*
-    The communication service provited between Qlik Engine and the plugin.
+    The communication service provided between the Qlik engine and the plugin.
     """
 
     def GetCapabilities(self, request, context):
-      """/ A handshake call for the Qlik Engine to understand the capability of the plugin.
+      """/ A handshake call for the Qlik engine to retrieve the capability of the plugin.
       """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
     def ExecuteFunction(self, request_iterator, context):
-      """/ Requests a function to be executed as specified in header.
+      """/ Requests a function to be executed as specified in the header.
       """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
       raise NotImplementedError('Method not implemented!')
 
     def EvaluateScript(self, request_iterator, context):
-      """/ Requests a script to be evaluated as specified in header.
+      """/ Requests a script to be evaluated as specified in the header.
       """
       context.set_code(grpc.StatusCode.UNIMPLEMENTED)
       context.set_details('Method not implemented!')
@@ -685,18 +793,18 @@ try:
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """*
-    The communication service provited between Qlik Engine and the plugin.
+    The communication service provided between the Qlik engine and the plugin.
     """
     def GetCapabilities(self, request, context):
-      """/ A handshake call for the Qlik Engine to understand the capability of the plugin.
+      """/ A handshake call for the Qlik engine to retrieve the capability of the plugin.
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def ExecuteFunction(self, request_iterator, context):
-      """/ Requests a function to be executed as specified in header.
+      """/ Requests a function to be executed as specified in the header.
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
     def EvaluateScript(self, request_iterator, context):
-      """/ Requests a script to be evaluated as specified in header.
+      """/ Requests a script to be evaluated as specified in the header.
       """
       context.code(beta_interfaces.StatusCode.UNIMPLEMENTED)
 
@@ -708,19 +816,19 @@ try:
     file not marked beta) for all further purposes. This class was generated
     only to ease transition from grpcio<0.15.0 to grpcio>=0.15.0."""
     """*
-    The communication service provited between Qlik Engine and the plugin.
+    The communication service provided between the Qlik engine and the plugin.
     """
     def GetCapabilities(self, request, timeout, metadata=None, with_call=False, protocol_options=None):
-      """/ A handshake call for the Qlik Engine to understand the capability of the plugin.
+      """/ A handshake call for the Qlik engine to retrieve the capability of the plugin.
       """
       raise NotImplementedError()
     GetCapabilities.future = None
     def ExecuteFunction(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
-      """/ Requests a function to be executed as specified in header.
+      """/ Requests a function to be executed as specified in the header.
       """
       raise NotImplementedError()
     def EvaluateScript(self, request_iterator, timeout, metadata=None, with_call=False, protocol_options=None):
-      """/ Requests a script to be evaluated as specified in header.
+      """/ Requests a script to be evaluated as specified in the header.
       """
       raise NotImplementedError()
 
