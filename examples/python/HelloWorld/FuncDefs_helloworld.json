@@ -1,40 +1,51 @@
 {
-    "Functions" : [
-        {
-            "Id" : 0,
-            "Name" : "HelloWorld",
-            "Type" : 2,
-            "ReturnType": 0,
-            "Params" : {
-                    "str1" : 0
-                }
-        },
-        {
-            "Id" : 1,
-            "Name" : "HelloWorldAggr",
-            "Type" : 1,
-            "ReturnType": 0,
-            "Params" : {
-                    "str1" : 0
-                }
-        },
-        {
-            "Id" : 2,
-            "Name" : "Cache",
-            "Type" : 2,
-            "ReturnType": 0,
-            "Params" : {
-                    "str1" : 0
-            }
-        },
-        {
-            "Id" : 3,
-            "Name" : "NoCache",
-            "Type" : 2,
-            "ReturnType": 0,
-            "Params" : {
-                    "str1" : 0
-            }
-        }
-    ]
+  "Functions": [
+    {
+      "Id": 0,
+      "Name": "HelloWorld",
+      "Type": 2,
+      "ReturnType": 0,
+      "Params": {
+        "str1": 0
+      }
+    },
+    {
+      "Id": 1,
+      "Name": "HelloWorldAggr",
+      "Type": 1,
+      "ReturnType": 0,
+      "Params": {
+        "str1": 0
+      }
+    },
+    {
+      "Id": 2,
+      "Name": "Cache",
+      "Type": 2,
+      "ReturnType": 0,
+      "Params": {
+        "str1": 0
+      }
+    },
+    {
+      "Id": 3,
+      "Name": "NoCache",
+      "Type": 2,
+      "ReturnType": 0,
+      "Params": {
+        "str1": 0
+      }
+    },
+    {
+      "Id": 4,
+      "Name": "EchoTable_3",
+      "Type": 2,
+      "ReturnType": 0,
+      "Params": {
+        "col1": 0,
+        "col2": 0,
+        "col3": 0
+      }
+    }
+  ]
 }
