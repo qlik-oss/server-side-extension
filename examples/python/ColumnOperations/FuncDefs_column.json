@@ -1,23 +1,33 @@
 {
-    "Functions" : [
-        {
-            "Id" : 0,
-            "Name" : "SumOfRows",
-            "Type" : 2,
-            "ReturnType": 1,
-            "Params" : {
-                    "col1" : 1,
-                    "col2" : 1
-                }
-        },
-        {
-            "Id" : 1,
-            "Name" : "SumOfColumn",
-            "Type" : 1,
-            "ReturnType": 1,
-            "Params" : {
-                    "col1" : 1
-                }
-        }
-    ]
+  "Functions": [
+    {
+      "Id": 0,
+      "Name": "SumOfRows",
+      "Type": 2,
+      "ReturnType": 1,
+      "Params": {
+        "col1": 1,
+        "col2": 1
+      }
+    },
+    {
+      "Id": 1,
+      "Name": "SumOfColumn",
+      "Type": 1,
+      "ReturnType": 1,
+      "Params": {
+        "col1": 1
+      }
+    },
+    {
+      "Id": 2,
+      "Name": "MaxOfColumns_2",
+      "Type": 2,
+      "ReturnType": 1,
+      "Params": {
+        "col1": 1,
+        "col2": 1
+      }
+    }
+  ]
 }

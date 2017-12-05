@@ -35,7 +35,7 @@ class TestColumnOperations:
 
         assert capabilities.allowScript is True
         assert capabilities.pluginIdentifier == 'Column Operations - Qlik'
-        assert capabilities.pluginVersion == 'v1.0.0-beta1'
+        assert capabilities.pluginVersion == 'v1.1.0'
 
     def test_executefunction(self):
         """

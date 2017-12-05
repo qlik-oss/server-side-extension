@@ -18,6 +18,7 @@ from ScriptEval_column import ScriptEval
 from SSEData_column import FunctionType
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
+_MINFLOAT = float('-inf')
 
 
 class ExtensionService(SSE.ConnectorServicer):
@@ -51,7 +52,8 @@ class ExtensionService(SSE.ConnectorServicer):
         """
         return {
             0: '_sum_of_rows',
-            1: '_sum_of_column'
+            1: '_sum_of_column',
+            2: '_max_of_columns_2'
         }
 
     """
@@ -59,10 +61,11 @@ class ExtensionService(SSE.ConnectorServicer):
     """
 
     @staticmethod
-    def _sum_of_rows(request):
+    def _sum_of_rows(request, context):
         """
         Summarize two parameters row wise. Tensor function.
         :param request: an iterable sequence of RowData
+        :param context:
         :return: the same iterable sequence of row data as received
         """
         # Iterate over bundled rows
@@ -87,10 +90,11 @@ class ExtensionService(SSE.ConnectorServicer):
             yield SSE.BundledRows(rows=response_rows)
 
     @staticmethod
-    def _sum_of_column(request):
+    def _sum_of_column(request, context):
         """
         Summarize the column sent as a parameter. Aggregation function.
         :param request: an iterable sequence of RowData
+        :param context:
         :return: int, sum if column
         """
         params = []
@@ -110,6 +114,39 @@ class ExtensionService(SSE.ConnectorServicer):
         # Create an iterable of dual with numerical value
         duals = iter([SSE.Dual(numData=result)])
 
+        # Yield the row data constructed
+        yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
+
+    @staticmethod
+    def _max_of_columns_2(request, context):
+        """
+        Find max of each column. This is a table function.
+        :param request: an iterable sequence of RowData
+        :param context:
+        :return: a table with numerical values, two columns and one row
+        """
+
+        result = [_MINFLOAT]*2
+
+        # Iterate over bundled rows
+        for request_rows in request:
+            # Iterating over rows
+            for row in request_rows.rows:
+                # Retrieve the numerical value of each parameter
+                # and update the result variable if it's higher than the previously saved value
+                for i in range(0, len(row.duals)):
+                    result[i] = max(result[i], row.duals[i].numData)
+
+        # Create an iterable of dual with numerical value
+        duals = iter([SSE.Dual(numData=r) for r in result])
+
+        # Set and send Table header
+        table = SSE.TableDescription(name='MaxOfColumns', numberOfRows=1)
+        table.fields.add(name='Max1', dataType=SSE.NUMERIC)
+        table.fields.add(name='Max2', dataType=SSE.NUMERIC)
+        md = (('qlik-tabledescription-bin', table.SerializeToString()),)
+        context.send_initial_metadata(md)
+        
         # Yield the row data constructed
         yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
 
@@ -147,7 +184,7 @@ class ExtensionService(SSE.ConnectorServicer):
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
                                         pluginIdentifier='Column Operations - Qlik',
-                                        pluginVersion='v1.0.0-beta1')
+                                        pluginVersion='v1.1.0')
 
         # If user defined functions supported, add the definitions to the message
         with open(self.function_definitions) as json_file:
@@ -179,7 +216,7 @@ class ExtensionService(SSE.ConnectorServicer):
         func_id = self._get_function_id(context)
         logging.info('ExecuteFunction (functionId: {})'.format(func_id))
 
-        return getattr(self, self.functions[func_id])(request_iterator)
+        return getattr(self, self.functions[func_id])(request_iterator, context)
 
     def EvaluateScript(self, request, context):
         """
