@@ -17,6 +17,7 @@ For details about a particular example, see its documentation:
 - [Hello world](HelloWorld/README.md)
 - [Column operations](ColumnOperations/README.md)
 - [Full script support](FullScriptSupport/README.md)
+- [Full script support using Pandas](FullScriptSupport_Pandas/README.md)
 
 ## Running the Python examples
 Follow these steps to quickly set up and run an example of your choice on your local machine, with an insecure connection, using either Qlik Sense Desktop, Qlik Sense Enterprise, QlikView Desktop or QlikView Server. To run several examples, or to run the examples with a secure connection or on another node, configure your system according to the instructions referenced in [Configuring SSE plugins in Qlik](../../docs/configuration.md). The `<examplename>`, `<EngineName>` and `<port>` referred to below are mapped to each example as follows:
@@ -26,6 +27,7 @@ Follow these steps to quickly set up and run an example of your choice on your l
 | __Hello world__ | helloworld | HelloWorld | 50052 |
 | __Column operations__ | column | Column | 50053 |
 | __Full script support__ | script | Script | 50051 |
+| __Full script support using Pandas__ | scriptPandas | ScriptPandas | 50056 |
 
 ### Qlik Sense Desktop
 1. Install Qlik Sense Desktop (June 2017 release or later).
@@ -79,5 +81,5 @@ Follow these steps to quickly set up and run an example of your choice on your l
 6. Start QlikView Server and open the app for the example you chose.
 
 ## Configuring all Python examples at once (except Qlik Sense Enterprise)
-In order to use all three Python examples in parallel, all you have to do is to map a different name to each port on the same line in *Settings.ini*:
-`SSEPlugin=Script,localhost:50051;HelloWorld,localhost:50052;Column,localhost:50053;`
+In order to use all four Python examples in parallel, all you have to do is to map a different name to each port on the same line in *Settings.ini*:
+`SSEPlugin=Script,localhost:50051;HelloWorld,localhost:50052;Column,localhost:50053;ScriptPandas,localhost:50056`
