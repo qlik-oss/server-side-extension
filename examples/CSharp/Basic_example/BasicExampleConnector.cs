@@ -76,6 +76,7 @@ namespace Basic_example
                 }
             }
         };
+
         public override Task<Capabilities> GetCapabilities(Empty request, ServerCallContext context)
         {
             if (Logger.IsTraceEnabled)
@@ -88,7 +89,6 @@ namespace Basic_example
             {
                 Logger.Debug("GetCapabilites called");
             }
-
 
             return Task.FromResult(ConnectorCapabilities);
         }
@@ -125,6 +125,7 @@ namespace Basic_example
                         while (await requestStream.MoveNext())
                         {
                             var resultBundle = new BundledRows();
+
                             foreach (var row in requestStream.Current.Rows)
                             {
                                 var resultRow = new Row();
@@ -177,6 +178,7 @@ namespace Basic_example
                         while (await requestStream.MoveNext())
                         {
                             var resultBundle = new BundledRows();
+
                             foreach (var row in requestStream.Current.Rows)
                             {
                                 var resultRow = new Row();
@@ -195,6 +197,7 @@ namespace Basic_example
                         while (await requestStream.MoveNext())
                         {
                             var resultBundle = new BundledRows();
+
                             foreach (var row in requestStream.Current.Rows)
                             {
                                 var resultRow = new Row();
@@ -207,13 +210,10 @@ namespace Basic_example
                     }
                 default:
                     break;
-
             }
 
             Logger.Trace("-- (ExecuteFunction) --");
-
         }
-
 
         private static long _callCounter = 0;
 
@@ -242,7 +242,7 @@ namespace Basic_example
                     var commonRequestHeader = new CommonRequestHeader();
                     commonRequestHeader.MergeFrom(new CodedInputStream(contextRequestHeader.ValueBytes));
 
-                    Logger.Trace($"CommonRequestHeader.FunctionId : {commonRequestHeader.AppId}");
+                    Logger.Trace($"CommonRequestHeader.AppId : {commonRequestHeader.AppId}");
                     Logger.Trace($"CommonRequestHeader.Cardinality : {commonRequestHeader.Cardinality}");
                     Logger.Trace($"CommonRequestHeader.UserId : {commonRequestHeader.UserId}");
                 }
@@ -255,6 +255,7 @@ namespace Basic_example
                     Logger.Trace($"ScriptRequestHeader.ReturnType : {scriptRequestHeader.ReturnType}");
 
                     int paramIdx = 0;
+
                     foreach (var parameter in scriptRequestHeader.Params)
                     {
                         Logger.Trace($"ScriptRequestHeader.Params[{paramIdx}].Name : {parameter.Name}");
@@ -272,6 +273,7 @@ namespace Basic_example
             {
                 var loggedValue = authContextProperty.Value;
                 var firstLineLength = loggedValue.IndexOf('\n');
+
                 if (firstLineLength > 0)
                 {
                     loggedValue = loggedValue.Substring(0, firstLineLength) + "<truncated at linefeed>";
@@ -280,6 +282,5 @@ namespace Basic_example
                 Logger.Trace($"{authContextProperty.Name} : {loggedValue}");
             }
         }
-
     }
 }
