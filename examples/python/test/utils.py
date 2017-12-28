@@ -1,7 +1,14 @@
 """
 Utils for SSE tests.
 """
-import test.ServerSideExtension_pb2 as SSE
+import os
+import sys
+
+# Add Generated folder to module path.
+PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(PARENT_DIR, 'Generated'))
+
+import ServerSideExtension_pb2 as SSE
 
 def to_string_parameters(*args):
     """
