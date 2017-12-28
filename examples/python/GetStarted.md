@@ -6,11 +6,12 @@ We provide several examples at different levels of complexity, each of which is 
 
 The following table includes a short description of each example and the functionality it demonstrates.
 
-| __Example__ | __Evaluation__ | __Function types__ | __Data types__ |  __Cache__ | __Description__ |
-|-----|------|-----|-----|----|-----|
-| __Hello world__ | Script, function | Tensor, Aggregation | String | Enabled (default), Disabled | Returns the same values as received, aggregating all values to a single string, both in script and function calls. Also demonstrates two functions with cache enabled, by default, and disabled by adding date time stamps to the end of each string value.|
-| __Column operations__ | Script, function| Tensor, Aggregation | Numeric | Enabled (default) | Adds two columns row-wise (tensor). Sums values in a column (aggregation). Demonstrates functionality both as script calls and function calls. |
-| __Full script support__ | Script | Scalar, Aggregation, Tensor | Numeric, String, Dual | Enabled (default) | Full script support including SSE calls in both load-script and in chart expressions. The Python code to be executed is written in the expression field directly, as a parameter to one of the script functions.|
+| __Example__ | __Evaluation__ | __Data types__ | __Description__ |
+|-----|------|-----|----|
+| __Hello world__ | Script, function | String | Returns the same values as received, aggregating all values to a single string, both in script and function calls. Also demonstrates two functions with cache enabled, by default, and disabled by adding date time stamps to the end of each string value.|
+| __Column operations__ | Script, function| Numeric | Adds two columns row-wise (tensor). Sums values in a column (aggregation). Demonstrates functionality both as script calls and function calls. |
+| __Full script support__ | Script | Numeric, String, Dual | Full script support including SSE calls in both load-script and in chart expressions. All script functions are supported.|
+| __Full script support using Pandas__ | Script | Numeric, String, Dual | Using the Pandas library and exec method to evaluate the script instead of eval. Also includes an example of writing a `TableDescription` in the script to be evaluated, when using the `Load ... Extension ...` statement. Otherwise it is the same example as the original full script support with all script functions supported. |
 
 For details about a particular example, see its documentation:
 - [Hello world](HelloWorld/README.md)
@@ -57,7 +58,7 @@ Follow these steps to quickly set up and run an example of your choice on your l
 ### QlikView Desktop
 1. Install QlikView Desktop (November 2017 release or later).
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
-3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file located at *C:\Users\\[user]\AppData\Roaming\QlikTech\QlikView*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
+3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file, below the heading [Settings 7]. *Settings.ini* is located at *C:\Users\\[user]\AppData\Roaming\QlikTech\QlikView*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
 4. Run the corresponding `ExtensionService_<examplename>.py` file. The easiest way to do this is to open a command prompt, go to the selected example folder and type:
 
    `python ExtensionService_<examplename>.py`  
@@ -68,7 +69,7 @@ Follow these steps to quickly set up and run an example of your choice on your l
 ### QlikView Server
 1. Install QlikView Server (November 2017 release or later).
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
-3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file located at *C:\ProgramData\QlikTech\QlikViewServer*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
+3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file, below the heading [Settings 7]. *Settings.ini* is located at *C:\ProgramData\QlikTech\QlikViewServer*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
 4. Add the *.qvw* file from the selected example folder to your document root (e.g. *C:\ProgramData\QlikTech\Documents*) or a mounted folder.
 5. Run the corresponding `ExtensionService_<examplename>.py` file. The easiest way to do this is to open a command prompt, go to folder for the selected example and type:
 
@@ -76,3 +77,7 @@ Follow these steps to quickly set up and run an example of your choice on your l
 
    Insert the value for `<examplename>` from the table above for the selected example.
 6. Start QlikView Server and open the app for the example you chose.
+
+## Configuring all Python examples at once (except Qlik Sense Enterprise)
+In order to use all three Python examples in parallel, all you have to do is to map a different name to each port on the same line in *Settings.ini*:
+`SSEPlugin=Script,localhost:50051;HelloWorld,localhost:50052;Column,localhost:50053;`
