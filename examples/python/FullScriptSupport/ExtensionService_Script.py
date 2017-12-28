@@ -54,7 +54,7 @@ class ExtensionService(SSE.ConnectorServicer):
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
                                         pluginIdentifier='Full Script Support - Qlik',
-                                        pluginVersion='v1.0.0-beta1')
+                                        pluginVersion='v1.1.0')
 
         return capabilities
 

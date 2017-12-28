@@ -32,7 +32,7 @@ class TestFullScriptSupport:
 
         assert capabilities.allowScript is True
         assert capabilities.pluginIdentifier == 'Full Script Support - Qlik'
-        assert capabilities.pluginVersion == 'v1.0.0-beta1'
+        assert capabilities.pluginVersion == 'v1.1.0'
 
     def test_evaluatescript(self):
         """
@@ -44,7 +44,7 @@ class TestFullScriptSupport:
         """
         params = to_numeric_parameters('num1', 'num2')
 
-        header = SSE.ScriptRequestHeader(script='args[0] + args[1]',
+        header = SSE.ScriptRequestHeader(script='sum(args[0] + args[1])',
                                          functionType=SSE.TENSOR,
                                          returnType=SSE.NUMERIC,
                                          params=params)

@@ -34,13 +34,9 @@ class ScriptEval:
         logging.info('EvaluateScript: {} ({} {}) {}'
                      .format(header.script, arg_types, ret_type, func_type))
 
-        aggr = (func_type == FunctionType.Aggregation)
-
         # Check if parameters are provided
         if header.params:
-            # Create an empty list if tensor function
-            if aggr:
-                all_rows = []
+            all_rows = []
 
             # Iterate over bundled rows
             for request_rows in request:
@@ -48,23 +44,22 @@ class ScriptEval:
                 for row in request_rows.rows:
                     # Retrieve parameters
                     params = self.get_arguments(context, arg_types, row.duals, header)
+                    all_rows.append(params)
 
-                    if aggr:
-                        # Append value to list, for later aggregation
-                        all_rows.append(params)
-                    else:
-                        # Evaluate script row wise
-                        yield self.evaluate(header.script, ret_type, params=params)
+            # First element in the parameter list should contain the data of the first parameter.
+            all_rows = [list(param) for param in zip(*all_rows)]
 
-            # Evaluate script based on data from all rows
-            if aggr:
-                # First element in the parameter list should contain the data of the first parameter.
-                params = [list(param) for param in zip(*all_rows)]
-                if arg_types == ArgType.Mixed:
-                    # Each parameter list should contain two lists, the first one consisting of numerical
-                    # representations and the second one, the string representations.
-                    params = [[list(datatype) for datatype in zip(*param)] for param in params]
-                yield self.evaluate(header.script, ret_type, params=params)
+            if arg_types == ArgType.Mixed:
+                param_datatypes = [param.dataType for param in header.params]
+                for i, datatype in enumerate(param_datatypes):
+                    if datatype == SSE.DUAL:
+                        # For easier access to the numerical and string representation of duals, in the script, we
+                        # split them to two list. For example, if the first parameter is dual, it will contain two lists
+                        # the first one being the numerical representation and the second one the string.
+                        all_rows[i] = [list(datatype) for datatype in zip(*all_rows[i])]
+
+            logging.debug('Received data from Qlik (args): {}'.format(all_rows))
+            yield self.evaluate(header.script, ret_type, params=all_rows)
 
         else:
             # No parameters provided
@@ -159,7 +154,17 @@ class ScriptEval:
             return ReturnType.Undefined
 
     @staticmethod
-    def evaluate(script, ret_type, params=[]):
+    def get_duals(result, ret_type):
+        if isinstance(result, str) or not hasattr(result, '__iter__'):
+            result = [result]
+        # Transform the result to an iterable of Dual data
+        if ret_type == ReturnType.String:
+            duals = [SSE.Dual(strData=col) for col in result]
+        elif ret_type == ReturnType.Numeric:
+            duals = [SSE.Dual(numData=col) for col in result]
+        return iter(duals)
+
+    def evaluate(self, script, ret_type, params=[]):
         """
         Evaluates a script with given parameters and construct the result to a Row of duals.
         :param script:  script to evaluate
@@ -168,14 +173,17 @@ class ScriptEval:
         :return: a RowData of string dual
         """
         # Evaluate script
-        print(params)
         result = eval(script, {'args': params, 'numpy': numpy})
+        logging.debug('Result: {}'.format(result))
 
-        # Transform the result to an iterable of Dual data
-        if ret_type == ReturnType.String:
-            duals = iter([SSE.Dual(strData=result)])
-        elif ret_type == ReturnType.Numeric:
-            duals = iter([SSE.Dual(numData=result)])
+        bundledRows = SSE.BundledRows()
+        if isinstance(result, str) or not hasattr(result, '__iter__'):
+            # A single value is returned
+            bundledRows.rows.add(duals=self.get_duals(result, ret_type))
+        else:
+            for row in result:
+                # note that each element of the result should represent a row
+                bundledRows.rows.add(duals=self.get_duals(row, ret_type))
 
-        return SSE.BundledRows(rows=[SSE.Row(duals=duals)])
+        return bundledRows
 
