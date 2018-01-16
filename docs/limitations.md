@@ -1,14 +1,14 @@
-# Limitations in this version of SSE plugins
+# Limitations
 
-#### Returning data to Qlik
-There is no support for returning several columns or higher-order data, to Qlik than was sent to the plugin. The cardinality of the response from the plugin must be the same as sent from Qlik.
-- If less rows, or lower cardinality, is sent back from the plugin, Qlik will add null values to match the number of rows sent from Qlik to the plugin originally. Note that the mapping may not work as intended if less data is sent back.
-- If higher-order data is sent back, either too many rows or more than one column, Qlik will neglect the additional data and only take the first _n_ rows in the first column, assuming _n_ is the number of rows sent to the plugin. Note that the mapping may not work as intended if more data is sent back.
+#### Expressions using SSE must persist the cardinality
+When you use SSE in a chart expression or in the Qlik load script (the `LOAD ... EXTENSION ...` statement excluded), you should preserve the cardinality and return a single column. In the case of aggregations, the response column should contain a single value (one row). In the case of tensor functions, the response column should contain the same number of rows as the request.
+- If too little data is returned from the plugin, Qlik will add null values to match the number of rows expected.
+- If higher-order data is returned, either too many rows or too many columns, Qlik will discard any additional data.
 
-#### Load script data cardinality (Qlik Limitation)
-There is no support for tensor calls from the load script. Only scalar and aggregation calls are supported.
+#### Chart expressions cannot consume a table returned from SSE plugin
+It is only possible to consume a returned table from an SSE call in the Qlik load script when using the `LOAD ... EXTENSION` statement. In all other cases, including chart expressions, only the first column returned from the plugin will be used by Qlik.
 
 #### Changes to plugins require engine restart (Qlik Limitation)
-If you add, remove, or change a plugin, you must restart the Qlik engine. For Qlik Sense this means either the engine service (for Qlik Sense Enterprise) or Qlik Sense Desktop. For QlikView, you must restart the QlikView Server service or QlikView Desktop.
+If you add, remove or change the capabilities of a plugin, you must restart the Qlik engine. For Qlik Sense this means either the engine service (for Qlik Sense Enterprise) or Qlik Sense Desktop. For QlikView, you must restart the QlikView Server service or QlikView Desktop.
 
-It is only during engine startup that the `GetCapability` plugin method is called.
+It is only during engine startup that Qlik tries to contact the SSE plugin by calling the `GetCapability` plugin method.

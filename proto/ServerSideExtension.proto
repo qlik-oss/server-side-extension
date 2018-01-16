@@ -43,6 +43,15 @@ message Parameter {
 }
 
 /**
+ * Field definition for function and script calls.
+ */
+ message FieldDescription {
+    DataType dataType = 1;      /// The data type of the field.
+    string name = 2;            /// The name of the field.
+    repeated string tags = 3;   /// The tags of the field.
+ }
+
+/**
  * The definition of a function, which informs the Qlik engine how to use it.
  */
 message FunctionDefinition {
@@ -113,6 +122,15 @@ message CommonRequestHeader {
 }
 
 /**
+ * A header sent before returning data to Qlik, under the key "qlik-tabledescription-bin".
+ */
+ message TableDescription {
+    repeated FieldDescription fields = 1;     /// The fields of the table.
+    string name = 2;                          /// The name of the table.
+    int64 numberOfRows = 3;                   /// Number of rows in table.
+ }
+
+/**
  * The communication service provided between the Qlik engine and the plugin.
  */
 service Connector
@@ -122,7 +140,7 @@ service Connector
 
     /// Requests a function to be executed as specified in the header.
     rpc ExecuteFunction (stream BundledRows) returns (stream BundledRows) {}
-    
+
     /// Requests a script to be evaluated as specified in the header.
     rpc EvaluateScript (stream BundledRows) returns (stream BundledRows) {}
 }

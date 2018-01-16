@@ -13,7 +13,7 @@ sys.path.append(os.path.join(PARENT_DIR, 'Generated'))
 
 import ServerSideExtension_pb2 as SSE
 import grpc
-from ScriptEval_script import ScriptEval
+from ScriptEval_scriptPandas import ScriptEval
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -53,8 +53,8 @@ class ExtensionService(SSE.ConnectorServicer):
         # Enable(or disable) script evaluation
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
-                                        pluginIdentifier='Full Script Support - Qlik',
-                                        pluginVersion='v1.1.0')
+                                        pluginIdentifier='Full Script Support using Pandas- Qlik',
+                                        pluginVersion='v1.0.0')
 
         return capabilities
 
@@ -114,7 +114,7 @@ class ExtensionService(SSE.ConnectorServicer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--port', nargs='?', default='50051')
+    parser.add_argument('--port', nargs='?', default='50056')
     parser.add_argument('--pem_dir', nargs='?')
     args = parser.parse_args()
 

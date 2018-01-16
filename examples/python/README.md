@@ -7,19 +7,22 @@ This section assumes you have read the following:
 * the documentation and tutorials for [gRPC](http://www.grpc.io/docs/) and [protobuf](https://developers.google.com/protocol-buffers/docs/overview), both with Python
 
 ## Content
-* [Implementation](#implementation)
-* [Creating the server](#creating-the-server)
-* [RPC methods](#rpc-methods)
-    * [`GetCapabilities` method](#getcapabilities-method)
-    * [`EvaluateScript` method](#evaluatescript-method)
-    * [`ExecuteFunction` method](#executefunction-method)
-      * [Function definitions](#function-definitions)
+* [Introduction](#introduction)
+* [Creating the server - with insecure/secure connection](#creating-the-server-with-insecuresecure-connection)
+* [`GetCapabilities` - Mandatory for all plugins](#getcapabilities)
+* [`EvaluateScript` - Support script evaluation!](#evaluatescript)
+* [`ExecuteFunction` - Add your own functions!](#executefunction)
+  * [Function definitions](#function-definitions)
+* [Metadata sent from Qlik to the Plugin](#metadata-sent-from-qlik-to-the-plugin)
+* [Metadata sent from the plugin to Qlik](#metadata-sent-from-the-plugin-to-qlik)
+  * [Cache control](#cache-control)
+  * [`TableDescription`](#tabledescription)
+* [Error handling](#error-handling)
 
-## Implementation
+## Introduction
+We have tried to provide well documented code in the examples that you can easily follow along with. If something is unclear, please let us know so that we can update and improve our documentation. In this file, we give you examples of how different functionalities _can be_ implemented using Python. Note that a different implementation might be better suited for your use case.
 
-The example plugins provided are all based on the same structure. They have more or less functionality supported depending on the complexity of the specific example.  
-
-In general, each plugin has the following files:
+The example plugins provided are all based on the same file structure with the following files:
 
 | __File__ | __Content__ |
 | ------ | ------ |
@@ -27,37 +30,34 @@ In general, each plugin has the following files:
 | `ScriptEval_<examplename>.py` | Used for script evaluation. The class `ScriptEval` contains methods for evaluating the script, retrieving data types or arguments etc. |
 | `SSEData_<examplename>.py`| Currently used for script evaluation only. Containing class enumerates of data types and function types. |
 
-The `<examplename>` is unique for each example.
+The `<examplename>` is unique for each example and can be found in [Getting started with the Python examples](GetStarted.md).
 
-## Creating the server
+## Creating the server - with insecure/secure connection
 
-The first step is to create the gRPC server and to add the `ConnectorServicer` to that server. Next, simply start the server.
+All examples support secure connection. If a path, to where the certificates are located, was added as a command argument when starting the server, a secure connection will be set up.
 
-``` python
+Assume `pem_dir` is the path to the certificates and `private_key`, `cert_chain` and `root_cert` the certificates themselves (read more in the [Generating certificates](../../generate_certs_guide/README.md) guide). `port` is the port the plugin listens to. Then the server can be set up and started as follows:
+
+```python
 import grpc
 import ServerSideExtension_pb2 as SSE
 
-class ExtensionExpression(SSE.ConnectorServicer):
-    ...
-    def Serve(self):
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        SSE.add_ConnectorServicer_to_server(self, server)
-        server.start()
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+SSE.add_ConnectorServicer_to_server(self, server)
+if pem_dir:
+    # secure connection
+    credentials = grpc.ssl_server_credentials([(private_key, cert_chain)], root_cert, True)
+    server.add_secure_port('[::]:{}'.format(port), credentials)
+else:
+    # insecure connection
+    server.add_insecure_port('[::]:{}'.format(port))
+server.start()
 ```
-Of course this is just a skeleton implementation. In the examples, you will find demonstrations of how to start the server with insecure/secure communication, how to change the port the server is listening to, and so on.
 
-## RPC methods
+## `GetCapabilities`
+The `GetCapabilities` method is mandatory for all plugins and is responsible for letting Qlik know what capabilities the plugin has.
 
-The RPC methods are `GetCapabilities`, `ExecuteFunction`, and `EvaluateScript`. The implementation of these methods differs depending on the supported functionality for your plugin. For instance, if you only support script evaluations you do not need to implement the `ExecuteFunction` method. However, the `GetCapabilities` method is mandatory, because that is where you define and send back the supported functionality to the client, i.e., the Qlik engine.
-
-### `GetCapabilities` method
-The `GetCapabilities` method includes the following variables you can use to define the capabilities for your plugin:
-* `allowScript`: a boolean enabling/disabling script evaluation,
-* `functions`: repeated function definitions.
-* `pluginIdentifier`: the ID or name of the plugin.
-* `pluginVersion`: the version of the plugin.
-
-In the Python examples, we use a separate JSON file in which we have collected all function definitions. This makes it easy to add each function to the `GetCapabilities` method. See an example of this JSON in the [Function Definitions](#function-definitions) section, below.
+In the Python examples, we use a separate JSON file in which we have collected all function definitions. This makes it easy to add each function to the `Capabilities` message. See an example of this JSON file in the [Function Definitions](#function-definitions) section.
 
 Note that both the request and the context are sent in every RPC call to the plugin. Furthermore, we need to add those as parameters even though we are not actively using them in this method.
 
@@ -67,10 +67,11 @@ import ServerSideExtension_pb2 as SSE
 class ExtensionExpression(SSE.ConnectiorServicer):
     ...
     def GetCapabilities(self, request, context):
+        # The plugin supports script evaluation
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
                                         pluginIdentifier='Hello World - Qlik',
-                                        pluginVersion='v1.0.0-beta1')
+                                        pluginVersion='v1.0.0')
 
         # If user defined functions supported, add the definitions to the message
         with open(self.function_definitions) as json_file:
@@ -89,13 +90,12 @@ class ExtensionExpression(SSE.ConnectiorServicer):
         return capabilities
 ```
 
+## `EvaluateScript`
+When you enable script evaluation, several script functions are automatically added to the functionality of the plugin, as described in [Writing an SSE Plugin](../../docs/writing_a_plugin.md). After the metadata sent in `ScriptRequestHeader` is fetched (see the  [Metadata sent from Qlik to the Plugin](#metadata-sent-from-qlik-to-the-plugin) section below), we can choose to support specific function or data types. The [HelloWorld](HelloWorld/README.md) example supports for example only strings and [ColumnOperations](ColumnOperations/README.md) only numerics.
 
-### `EvaluateScript` method
-When you enable script evaluation, several script functions are automatically added to the functionality of the plugin, as described in [Writing an SSE Plugin](../../docs/writing_a_plugin.md). The example plugins provided for Python are fairly similar to one another. The difference is the supported functionality for different data types.
+In example plugins with limited support, we check the function type in the `EvaluateScript` function and, depending on the answer, we either raise an "unimplemented" error or we continue with our evaluation. In the example code below, we support functionality for aggregation and tensor functions. Please look at the implementation in any of the examples, to see the rest of the flow in script evaluation.
 
-In example plugins with limited support, we check the function type in the `EvaluateScript` function and, depending on the answer, we either raise an "unimplemented" error or continue with our evaluation. In the example code below, we support functionality for aggregation and tensor functions. __Note__ that you must set the _status code_ in the context to be able to include the correct error code in the SSE logs from the Qlik engine. Otherwise the logging will show undefined error. The details including the message will also be visible in the SSE logs if set.
-
-If you are interested in implementing a plugin that supports script evaluation, see the [FullScriptSupport](FullScriptSupport/README.md) example.
+If you are interested in implementing a plugin that supports all script functions, see the [FullScriptSupport using Pandas](FullScriptSupport_Pandas/README.md) example.
 
 ```python
 import ServerSideExtension_pb2 as SSE
@@ -128,8 +128,8 @@ class ExtensionExpression(SSE.ConnectiorServicer):
             raise grpc.RpcError(grpc.StatusCode.UNIMPLEMENTED, msg)
 ```
 
-### `ExecuteFunction` method
-When the client (i.e., the Qlik engine) calls a plugin function, the function ID is sent in a header to the server, which runs the `ExecuteFunction` method. In the examples we use a mapping between the function ID and the method name of the user defined functions (see the `functions` method in the following code example).
+## `ExecuteFunction`
+In the provided Python examples we have mapped each function Id to the name of the function implemented. The function Id is retrieved from the `FunctionRequestHeader` (see more in the [Metadata sent from Qlik to the plugin]() section below).
 
 ```python
 import ServerSideExtension_pb2 as SSE
@@ -151,8 +151,7 @@ class ExtensionExpression(SSE.ConnectiorServicer):
         return getattr(self, self.functions[func_id])(request_iterator)
 ```
 
-
-#### Function definitions
+### Function definitions
 
 The following code, which is taken from the [Hello World](HelloWorld/README.md) example, shows the structure of a JSON function definition file:
 
@@ -178,18 +177,51 @@ where:
 * `"ReturnType" : 0` indicates that the _data type_ of the return value is string.
 * `"str1" : 0` indicates that the first parameter, named `"str1"`, is of _data type_ string.
 
-The function types are mapped as follows:
+The data types and function types are described in the SSE Protocol Documentation [here](../../docs/SSE_Protocol.md#qlik.sse.DataType).
 
-| | __Function Type__ |
-| ----- | ----- |
-| __0__ | Scalar |
-| __1__ | Aggregation |
-| __2__ | Tensor |
+## Metadata sent from Qlik to the Plugin
+The context of the request contains the metadata sent from Qlik to the plugin. From the dictionary the different request headers can be retrieved as follows:
+```python
+metadata = dict(context.invocation_metadata())
+header = SSE.<RequestHeader>()                                    # first letters should be capital letters
+header.ParseFromString(metadata['qlik-<requestheader>-bin'])      # lower-case
+```
+Where _\<RequestHeader\>_ is one of the three possible headers mentioned below e.g. `CommonRequestHeader`. The _\<requestheader\>_ is the same but with lower-case letters e.g. `commonrequestheader`.
 
-And the data types, both of parameters as well as return types, are mapped as follows:
+The `CommonRequestHeader` is not used in any example provided for Python, but can be useful for user or plugin version restrictions.
 
-| | __Data Type__ |
-| ----- | ----- |
-| __0__ | String |
-| __1__ | Numeric |
-| __2__ | Dual |
+The `ScriptRequestHeader` is used in all examples for retrieving function type, return type, script etc.
+
+The `FunctionRequestHeader` is used in [HelloWorld](HelloWorld/README.md) and [ColumnOperations](ColumnOperations/README.md) where we have demonstrated plugin defined functions. The header is used for retrieving function id which we mapped to the implementation of the specific functions.
+
+## Metadata sent from the plugin to Qlik
+### Cache control
+Cache metadata can be sent to Qlik both as initial and trailing metadata. See the [HelloWorld](HelloWorld/README.md) example for a practical example.
+```python
+md = (('qlik-cache', 'no-store'),)
+context.send_initial_metadata(md)
+```
+
+### `TableDescription`
+The [ColumnOperations](ColumnOperations/README.md) example is demonstrating this in a plugin defined function. [FullScriptSupport using pandas](FullScriptSupport_Pandas/README.md) is demonstrating how the message can be modified from the script.
+
+Note that the `TableDescription` must be sent as _initial_ metadata and that the number of columns of data sent back to Qlik must match the number of fields in the `TableDescription`.
+```python
+table = SSE.TableDescription(name='MaxOfColumns', numberOfRows=1)
+table.fields.add(name='Max1', dataType=SSE.NUMERIC)
+table.fields.add(name='Max2', dataType=SSE.NUMERIC)
+md = (('qlik-tabledescription-bin', table.SerializeToString()),)
+context.send_initial_metadata(md)
+```
+
+## Error handling
+You can set a GRPC status code and extra details to the context when an error occur to pass the information to Qlik. The message will then be logged in the SSE log file. If no status code is provided, _undefined error_ will be used.
+
+In the example code below, a specific function type is not supported.
+```python
+msg = 'Function type {} is not supported in this plugin.'.format(func_type.name)
+context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+context.set_details(msg)
+# Raise error on the plugin-side
+raise grpc.RpcError(grpc.StatusCode.UNIMPLEMENTED, msg)
+```

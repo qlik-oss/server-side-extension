@@ -8,11 +8,13 @@
  * [CommonRequestHeader](#qlik.sse.CommonRequestHeader)
  * [Dual](#qlik.sse.Dual)
  * [Empty](#qlik.sse.Empty)
+ * [FieldDescription](#qlik.sse.FieldDescription)
  * [FunctionDefinition](#qlik.sse.FunctionDefinition)
  * [FunctionRequestHeader](#qlik.sse.FunctionRequestHeader)
  * [Parameter](#qlik.sse.Parameter)
  * [Row](#qlik.sse.Row)
  * [ScriptRequestHeader](#qlik.sse.ScriptRequestHeader)
+ * [TableDescription](#qlik.sse.TableDescription)
  * [DataType](#qlik.sse.DataType)
  * [FunctionType](#qlik.sse.FunctionType)
  * [Connector](#qlik.sse.Connector)
@@ -51,7 +53,7 @@ A full description of the plugin, sent to the Qlik engine, listing all functions
 <a name="qlik.sse.CommonRequestHeader"/>
 
 ### CommonRequestHeader
-A header sent at the start of both an EvaluateScript request and an ExecuteFunction request under the key &quot;qlik-commonrequestheader-bin&quot;.
+A header sent at the start of both an EvaluateScript request and an ExecuteFunction request under the key "qlik-commonrequestheader-bin".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -80,6 +82,18 @@ An empty message used when nothing is to be passed in a call.
 | ----- | ---- | ----- | ----------- |
 
 
+<a name="qlik.sse.FieldDescription"/>
+
+### FieldDescription
+Field definition for function and script calls.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| dataType | [DataType](#qlik.sse.DataType) | optional | The data type of the field. |
+| name | [string](#string) | optional | The name of the field. |
+| tags | [string](#string) | repeated | The tags of the field. |
+
+
 <a name="qlik.sse.FunctionDefinition"/>
 
 ### FunctionDefinition
@@ -97,7 +111,7 @@ The definition of a function, which informs the Qlik engine how to use it.
 <a name="qlik.sse.FunctionRequestHeader"/>
 
 ### FunctionRequestHeader
-A header sent at the start of an ExecuteFunction request under the key &quot;qlik-functionrequestheader-bin&quot;.
+A header sent at the start of an ExecuteFunction request under the key "qlik-functionrequestheader-bin".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -129,7 +143,7 @@ A row of duals.
 <a name="qlik.sse.ScriptRequestHeader"/>
 
 ### ScriptRequestHeader
-A header sent at the start of an EvaluateScript request under the key &quot;qlik-scriptrequestheader-bin&quot;.
+A header sent at the start of an EvaluateScript request under the key "qlik-scriptrequestheader-bin".
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -137,6 +151,18 @@ A header sent at the start of an EvaluateScript request under the key &quot;qlik
 | functionType | [FunctionType](#qlik.sse.FunctionType) | optional | The function type of the script evaluation: scalar, aggregation or tensor. |
 | returnType | [DataType](#qlik.sse.DataType) | optional | The return type from the script evaluation: numeric, string or both. |
 | params | [Parameter](#qlik.sse.Parameter) | repeated | The parameters names and types passed to the script. |
+
+
+<a name="qlik.sse.TableDescription"/>
+
+### TableDescription
+A header sent before returning data to Qlik, under the key "qlik-tabledescription-bin".
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| fields | [FieldDescription](#qlik.sse.FieldDescription) | repeated | The fields of the table. |
+| name | [string](#string) | optional | The name of the table. |
+| numberOfRows | [int64](#int64) | optional | Number of rows in table. |
 
 
 

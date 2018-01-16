@@ -54,7 +54,8 @@ class ExtensionService(SSE.ConnectorServicer):
             0: '_hello_world',
             1: '_hello_world_aggr',
             2: '_cache',
-            3: '_no_cache'
+            3: '_no_cache',
+            4: '_echo_table'
         }
 
     @staticmethod
@@ -163,6 +164,20 @@ class ExtensionService(SSE.ConnectorServicer):
                 # Yield the row data as bundled rows
                 yield SSE.BundledRows(rows=[SSE.Row(duals=duals)])
 
+    @staticmethod
+    def _echo_table(request, context):
+        """
+        Echo the input table.
+        :param request:
+        :param context:
+        :return:
+        """
+        for request_rows in request:
+            response_rows = []
+            for row in request_rows.rows:
+                response_rows.append(row)
+            yield SSE.BundledRows(rows=response_rows)
+
     """
     Implementation of rpc functions.
     """
@@ -183,7 +198,7 @@ class ExtensionService(SSE.ConnectorServicer):
         # Set values for pluginIdentifier and pluginVersion
         capabilities = SSE.Capabilities(allowScript=True,
                                         pluginIdentifier='Hello World - Qlik',
-                                        pluginVersion='v1.0.0-beta1')
+                                        pluginVersion='v1.1.0')
 
         # If user defined functions supported, add the definitions to the message
         with open(self.function_definitions) as json_file:

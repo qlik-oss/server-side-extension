@@ -1,8 +1,15 @@
 """
 Basic testing of SSE functionality.
 """
+import os
+import sys
+
+# Add Generated folder to module path.
+PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(PARENT_DIR, 'Generated'))
+
 import grpc
-import test.ServerSideExtension_pb2 as SSE
+import ServerSideExtension_pb2 as SSE
 from test.utils import numbers_to_duals
 from test.utils import duals_to_rows
 from test.utils import to_numeric_parameters
@@ -35,7 +42,7 @@ class TestColumnOperations:
 
         assert capabilities.allowScript is True
         assert capabilities.pluginIdentifier == 'Column Operations - Qlik'
-        assert capabilities.pluginVersion == 'v1.0.0-beta1'
+        assert capabilities.pluginVersion == 'v1.1.0'
 
     def test_executefunction(self):
         """
