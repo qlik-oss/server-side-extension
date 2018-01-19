@@ -4,9 +4,7 @@ import logging.config
 import ServerSideExtension_pb2 as SSE
 import grpc
 import numpy
-from SSEData_script import ArgType, \
-                           FunctionType, \
-                           ReturnType
+from ssedata import ArgType, FunctionType, ReturnType
 
 
 class ScriptEval:

@@ -5,9 +5,7 @@ import ServerSideExtension_pb2 as SSE
 import grpc
 import numpy
 import pandas
-from SSEData_scriptPandas import ArgType,       \
-                                 FunctionType,  \
-                                 ReturnType
+from ssedata import ArgType, FunctionType, ReturnType
 
 
 class ScriptEval:

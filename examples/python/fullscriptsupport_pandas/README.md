@@ -1,5 +1,5 @@
 # Example: Full script support using Pandas
-This example plugin includes support for all script functionality and is based on the original [Full Script Support](../FullScriptSupport/README.md) Python example. The implementation of this plugin differs mainly in the use of the Pandas library. In addition, the data received from Qlik is now saved to a Pandas data frame. In this example, we use the `exec` method to evaluate the script rather than the `eval` method, as we did in the original example plugin. This change makes it possible to pass a multiline script from Qlik.
+This example plugin includes support for all script functionality and is based on the original [Full Script Support](../fullscriptsupport/README.md) Python example. The implementation of this plugin differs mainly in the use of the Pandas library. In addition, the data received from Qlik is now saved to a Pandas data frame. In this example, we use the `exec` method to evaluate the script rather than the `eval` method, as we did in the original example plugin. This change makes it possible to pass a multiline script from Qlik.
 
 ## Content
 * [Implementation](#implementation)
