@@ -2,9 +2,7 @@ import logging
 import logging.config
 
 import grpc
-from SSEData_helloworld import ArgType, \
-                               ReturnType, \
-                               FunctionType
+from ssedata import ArgType, ReturnType, FunctionType
 
 import ServerSideExtension_pb2 as SSE
 

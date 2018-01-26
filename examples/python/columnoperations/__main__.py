@@ -10,12 +10,12 @@ from concurrent import futures
 
 # Add Generated folder to module path.
 PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(PARENT_DIR, 'Generated'))
+sys.path.append(os.path.join(PARENT_DIR, 'generated'))
 
 import ServerSideExtension_pb2 as SSE
 import grpc
-from ScriptEval_column import ScriptEval
-from SSEData_column import FunctionType
+from scripteval import ScriptEval
+from ssedata import FunctionType
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 _MINFLOAT = float('-inf')
@@ -287,11 +287,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', nargs='?', default='50053')
     parser.add_argument('--pem_dir', nargs='?')
-    parser.add_argument('--definition_file', nargs='?', default='FuncDefs_column.json')
+    parser.add_argument('--definition_file', nargs='?', default='functions.json')
     args = parser.parse_args()
 
     # need to locate the file when script is called from outside it's location dir.
-    def_file = os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), args.definition_file)
+    def_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), args.definition_file)
 
     calc = ExtensionService(def_file)
     calc.Serve(args.port, args.pem_dir)

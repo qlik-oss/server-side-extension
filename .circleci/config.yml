@@ -12,17 +12,17 @@ jobs:
 
       - run:
           name: Start FullScriptSupport plugin on port 50051
-          command: python ./examples/python/FullScriptSupport/ExtensionService_Script.py
+          command: python ./examples/python/fullscriptsupport/
           background: true
 
       - run:
           name: Start HelloWorld plugin on port 50052
-          command: python ./examples/python/HelloWorld/ExtensionService_helloworld.py
+          command: python ./examples/python/helloworld/
           background: true
 
       - run:
           name: Start ColumnOperations plugin on port 50053
-          command: python ./examples/python/ColumnOperations/ExtensionService_column.py
+          command: python ./examples/python/columnoperations/
           background: true
 
       - run:

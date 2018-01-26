@@ -26,11 +26,11 @@ The example plugins provided are all based on the same file structure with the f
 
 | __File__ | __Content__ |
 | ------ | ------ |
-| `ExtensionService_<examplename>.py` | The class `ExtensionService` containing the implementation of the RPC methods and the creation of the gRPC server. This file is the main file for the plugin and is the one that needs to be running before the Qlik engine is started.|
-| `ScriptEval_<examplename>.py` | Used for script evaluation. The class `ScriptEval` contains methods for evaluating the script, retrieving data types or arguments etc. |
-| `SSEData_<examplename>.py`| Currently used for script evaluation only. Containing class enumerates of data types and function types. |
+| `<examplename>\__main__.py` | The class `ExtensionService` containing the implementation of the RPC methods and the creation of the gRPC server. This file is the main file for the plugin and is the one that needs to be running before the Qlik engine is started.|
+| `<examplename>\scripteval` | Used for script evaluation. The class `ScriptEval` contains methods for evaluating the script, retrieving data types or arguments etc. |
+| `<examplename>\ssedata`| Currently used for script evaluation only. Containing class enumerates of data types and function types. |
 
-The `<examplename>` is unique for each example and can be found in [Getting started with the Python examples](GetStarted.md).
+The `<examplename>` is the python package name for each example and can be found in [Getting started with the Python examples](GetStarted.md).
 
 ## Creating the server - with insecure/secure connection
 
@@ -91,11 +91,11 @@ class ExtensionExpression(SSE.ConnectiorServicer):
 ```
 
 ## `EvaluateScript`
-When you enable script evaluation, several script functions are automatically added to the functionality of the plugin, as described in [Writing an SSE Plugin](../../docs/writing_a_plugin.md). After the metadata sent in `ScriptRequestHeader` is fetched (see the  [Metadata sent from Qlik to the Plugin](#metadata-sent-from-qlik-to-the-plugin) section below), we can choose to support specific function or data types. The [HelloWorld](HelloWorld/README.md) example supports for example only strings and [ColumnOperations](ColumnOperations/README.md) only numerics.
+When you enable script evaluation, several script functions are automatically added to the functionality of the plugin, as described in [Writing an SSE Plugin](../../docs/writing_a_plugin.md). After the metadata sent in `ScriptRequestHeader` is fetched (see the  [Metadata sent from Qlik to the Plugin](#metadata-sent-from-qlik-to-the-plugin) section below), we can choose to support specific function or data types. The [HelloWorld](helloworld/README.md) example supports for example only strings and [ColumnOperations](columnoperations/README.md) only numerics.
 
 In example plugins with limited support, we check the function type in the `EvaluateScript` function and, depending on the answer, we either raise an "unimplemented" error or we continue with our evaluation. In the example code below, we support functionality for aggregation and tensor functions. Please look at the implementation in any of the examples, to see the rest of the flow in script evaluation.
 
-If you are interested in implementing a plugin that supports all script functions, see the [FullScriptSupport using Pandas](FullScriptSupport_Pandas/README.md) example.
+If you are interested in implementing a plugin that supports all script functions, see the [FullScriptSupport using Pandas](fullscriptsupport_pandas/README.md) example.
 
 ```python
 import ServerSideExtension_pb2 as SSE
@@ -153,7 +153,7 @@ class ExtensionExpression(SSE.ConnectiorServicer):
 
 ### Function definitions
 
-The following code, which is taken from the [Hello World](HelloWorld/README.md) example, shows the structure of a JSON function definition file:
+The following code, which is taken from the [Hello World](helloworld/README.md) example, shows the structure of a JSON function definition file:
 
 ```json
 {
@@ -196,14 +196,14 @@ The `FunctionRequestHeader` is used in [HelloWorld](HelloWorld/README.md) and [C
 
 ## Metadata sent from the plugin to Qlik
 ### Cache control
-Cache metadata can be sent to Qlik both as initial and trailing metadata. See the [HelloWorld](HelloWorld/README.md) example for a practical example.
+Cache metadata can be sent to Qlik both as initial and trailing metadata. See the [HelloWorld](helloworld/README.md) example for a practical example.
 ```python
 md = (('qlik-cache', 'no-store'),)
 context.send_initial_metadata(md)
 ```
 
 ### `TableDescription`
-The [ColumnOperations](ColumnOperations/README.md) example is demonstrating this in a plugin defined function. [FullScriptSupport using pandas](FullScriptSupport_Pandas/README.md) is demonstrating how the message can be modified from the script.
+The [ColumnOperations](columnoperations/README.md) example is demonstrating this in a plugin defined function. [FullScriptSupport using pandas](fullscriptsupport_pandas/README.md) is demonstrating how the message can be modified from the script.
 
 Note that the `TableDescription` must be sent as _initial_ metadata and that the number of columns of data sent back to Qlik must match the number of fields in the `TableDescription`.
 ```python

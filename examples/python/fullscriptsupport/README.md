@@ -41,7 +41,7 @@ If the parameter has the datatype _Dual_, containing both numeric and string rep
 ### Script evaluation and result
 The given script is evaluated with the python method `eval` after all rows have been collected. `eval` evaluates a python expression and does not work very well with more complex scripts. See documentation of the method `eval` [here](https://docs.python.org/3/library/functions.html#eval).
 
-For multiline scripts or if you want to write more complex scripts we recommend you to take a look at the [FullScriptSupport using Pandas](../FullScriptSupport_Pandas/README.md) example plugin. The difference is mainly the use of `Pandas` for storing parameters and the method `exec` for evaluating the script.
+For multiline scripts or if you want to write more complex scripts we recommend you to take a look at the [FullScriptSupport using Pandas](../fullscriptsupport_pandas/README.md) example plugin. The difference is mainly the use of `Pandas` for storing parameters and the method `exec` for evaluating the script.
 
 The result is expected to be row wise, that meaning that the first element is the first row of the result. If multiple columns are returned in a `Load ... Extension ...` statement, the first element should have the same length as number of parameters.
 
