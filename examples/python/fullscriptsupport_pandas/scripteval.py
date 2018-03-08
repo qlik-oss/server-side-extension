@@ -126,7 +126,8 @@ class ScriptEval:
             msg = 'Undefined argument type: '.format(arg_types)
             self.raise_grpc_error(context, grpc.StatusCode.INVALID_ARGUMENT, msg)
 
-        return pandas.Series(script_args), dual_type
+        # dtype=object is needed if the data is not homogeneous, e.g. data type dual
+        return pandas.Series(script_args, dtype=object), dual_type
 
     @staticmethod
     def get_arg_types(header):
@@ -165,13 +166,26 @@ class ScriptEval:
 
     @staticmethod
     def get_duals(result, ret_type):
-        if isinstance(result, str) or not hasattr(result, '__iter__'):
-            result = [result]
+        """
+        Transforms one row in qResult to an iterable of duals.
+        :param result: one row of qResult
+        :param ret_type: a list containing a data type for each column in qResult
+        :return: one row of data as an iterable of duals
+        """
+        # result must be iterable
+        result = [result] if isinstance(result, (str, tuple)) or not hasattr(result, '__iter__') else result
         # Transform the result to an iterable of Dual data
-        if ret_type == ReturnType.String:
-            return iter([SSE.Dual(strData=col) for col in result])
-        elif ret_type == ReturnType.Numeric:
-            return iter([SSE.Dual(numData=col) for col in result])
+        duals = []
+        for i, col in enumerate(result):
+            data_type = ret_type[i]
+            if data_type == ReturnType.String:
+                duals.append(SSE.Dual(strData=col))
+            elif data_type == ReturnType.Numeric:
+                duals.append(SSE.Dual(numData=col))
+            elif data_type == ReturnType.Dual:
+                # col is a tuple with a numeric and string representation
+                duals.append(SSE.Dual(numData=col[0], strData=col[1]))
+        return iter(duals)
 
     @staticmethod
     def send_table_description(table, context):
@@ -210,6 +224,19 @@ class ScriptEval:
 
             if 'tableDescription' in locals_added and locals_added['tableDescription'] is True:
                 self.send_table_description(table, context)
+                # If a tableDescription is sent, the return type should be updated accordingly
+                ret_type = [ReturnType(field.dataType) for field in table.fields]
+            else:
+                # All returned columns have the same data type as the return type of the function
+                if isinstance(qResult, str) or not hasattr(qResult, '__iter__'):
+                    columns = 1
+                else:
+                    if type(qResult) in [list, tuple]:
+                        # Transformed to an array for simplifying getting the shape of the result, which can be of
+                        # different types
+                        qResult = numpy.array(qResult)
+                    columns = 1 if len(qResult.shape) == 1 else qResult.shape[1]
+                ret_type = [ret_type] * columns
 
             # Transform the result to bundled rows
             bundledRows = SSE.BundledRows()
