@@ -48,7 +48,8 @@ Follow these steps to quickly set up and run an example of your choice on your l
 
     Alternatively, add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *settings.ini* file located at *C:\ProgramData\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
 
-    __Note:__ Configuring the plugin via the *settings.ini* file is only valid for this node/machine; the settings will not be visible in the QMC. Also no access rules would apply in this case.
+    __Note:__ Configuring the plugin via the *settings.ini* file is only valid for this node/machine; the settings will not be visible in the QMC. Also no access rules would apply in this case.  
+    __Note:__ If you are using _Sense April 2018_, you can configure your plugins in QMC during runtime without having to restart Qlik engine in step 6 below. See [Limitations](../../docs/limitations.md) for more details.
 4. Add the *.qvf* file from the selected example folder to QMC.
 5. Run the corresponding `<examplename>` python package. The easiest way to do this is to open a command prompt, go to the example\python folder and type:
 
