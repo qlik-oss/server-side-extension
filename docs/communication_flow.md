@@ -6,9 +6,7 @@ The following diagram demonstrates the communication between the Qlik Client (bo
 
 The communication flow is as follows:
 
-1. The start order of the SSE plugin (the server) and the Qlik Engine service depends on how you are configuring the plugin.
-    * Using QMC and _Sense Enterprise April 2018_: Any changes in the configurations can be done during runtime and you can start in any order you would like.  
-    * Configuration using Settings.ini or QMC and earlier releases: The SSE plugin must be running before the Qlik Engine service is started. Any changes in the configuration requires a restart of the Qlik Engine service. See [Limitations](limitation.md) for more information.
+1. From April 2018 we will retry connections to all plugins, both from QRS or settings.ini, so the plugin is not required to run before starting engine.
 2. The Qlik Engine checks the SSE configuration. Are there any plugins configured? What are their names and on what addresses are they running? Are they running with secure or insecure connection?
 3. The Qlik Engine uses the address and the name fetched in the configuration and makes the first call to the plugin using `GetCapabilities`, an RPC method, to fetch the capabilities of the plugin.
 4. The plugin answers with its capabilities. Is script evaluation enabled? Are any functions added? Does the plugin have an identifier and a version?

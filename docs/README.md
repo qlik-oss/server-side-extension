@@ -16,6 +16,8 @@ The following diagram shows an example of SSE plugins communicating with Qlik:
 - Qlik is the **client**
 - The SSE plugin (Python, etc.) is the **server**.  
 
+Before April 2018, the server (that is, the plugin) must be started and running before the Qlik engine is started.
+
 ## Considerations
 
 * **General security attention**  
