@@ -1,7 +1,8 @@
 # Server Side Extension
 
 This repository provides a server-side extension (SSE) protocol based on gRPC that allows you to extend the Qlik built-in expression library with functionality from external calculation engines. You can use external calculation engines in both load scripts and charts. In Qlik Sense and QlikView, you connect to these server-side extensions (SSEs) by defining analytic connections.  
-This repository includes documentation that describes the SSE protocol, how to use it and how to build your own plugins. Currently we have examples written in a few different languages only but examples in more languages will come later.  
+
+This repository includes documentation that describes the SSE protocol, how to use it and how to build your own plugins. We have also examples written in a couple of different languages.  
 
 ## Status
 [![CircleCI](https://circleci.com/gh/qlik-oss/server-side-extension.svg?style=shield)](https://circleci.com/gh/qlik-oss/server-side-extension)  

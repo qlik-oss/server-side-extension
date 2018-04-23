@@ -59,4 +59,3 @@ Start the plugin.
 
 **In a command prompt:** Go to `basic_example/target` and run `java -jar basic-example-1.0-SNAPSHOT.jar --pemDir [some location]\generate_certs_guide\sse_<Plugin name>_generated_certs\sse_<Plugin name>_server_certs`. 
 If you want, you can specify the port with `--port <Port number>`.
-Restart Qlik Sense Enterprise and go to the hub.
