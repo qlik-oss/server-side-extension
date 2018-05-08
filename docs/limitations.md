@@ -11,6 +11,6 @@ It is only possible to consume a returned table from an SSE call in the Qlik loa
 #### Changes to plugins require engine restart (Qlik Limitation, except Sense Enterprise April 2018)
 If you add, remove or change the capabilities of a plugin, you must restart the Qlik engine. For Qlik Sense this means either the engine service (for Qlik Sense Enterprise) or Qlik Sense Desktop. For QlikView, you must restart the QlikView Server service or QlikView Desktop.
 
-It is only during engine startup that Qlik tries to contact the SSE plugin by calling the `GetCapability` plugin method.
+It is only during engine startup that Qlik tries to contact the SSE plugin by calling the `GetCapabilities` plugin method.
 
-_Update:_ This is __no longer a limitation__ in the Sense Enterprise April 2018 release if the plugin is configured in the QMC. If you are using the Settings.ini file to configure the plugins, you still need to restart Qlik engine if you change the capabilities.
+_Update:_ Starting with Sense Enterprise April 2018 release, `GetCapabilities` is called whenever a plugin is added, removed or reconfigured in Qlik management console. This means you do not have to restart the Qlik engine in these cases. If you add, remove or reconfigure a plugin in the Settings.ini file, you still need to restart the Qlik engine.
