@@ -13,4 +13,4 @@ If you add, remove or change the capabilities of a plugin, you must restart the 
 
 It is only during engine startup that Qlik tries to contact the SSE plugin by calling the `GetCapabilities` plugin method.
 
-_Update:_ Starting with Sense Enterprise April 2018 release, `GetCapabilities` is called whenever a plugin is added, removed or reconfigured in Qlik management console. This means you do not have to restart the Qlik engine in these cases. If you add, remove or reconfigure a plugin in the Settings.ini file, you still need to restart the Qlik engine.
+_Update:_ Starting with Sense Enterprise April 2018 release, `GetCapabilities` is called whenever a plugin is added, removed or reconfigured in Qlik Management Console. This means you do not have to restart the Qlik engine in these cases. If you add, remove or reconfigure a plugin in the Settings.ini file, you still need to restart the Qlik engine.
