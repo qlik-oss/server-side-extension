@@ -1,7 +1,7 @@
 # Prerequisites for running the Python examples
 To run the Python SSE plugin examples, you need __Python__ version 3.4 or higher along with a few _python libraries_.
 
-Anaconda is a Python distribution pre-bundled with multiple extra libraries, some of the ones used in the examples here. An installer can be downloaded from the [Anaconda webpage](https://www.continuum.io/downloads). For a leaner installation the default installer can be found on the webpage of the [Python Software Foundation](https://www.python.org/downloads/).
+Anaconda is a Python distribution pre-bundled with multiple extra libraries. An installer can be downloaded from the [Anaconda webpage](https://www.continuum.io/downloads). For a leaner installation the default installer can be found on the webpage of the [Python Software Foundation](https://www.python.org/downloads/).
 
 The following _python libraries_ are needed for the specified SSE plugins.
 
@@ -15,4 +15,4 @@ The simplest way to acquire the libraries is to use the Python package manager `
 
 __Note__
 --------
-The `requirements.txt` specifies the dependencies and the recommended versions. If you choose to install the libraries manually yourself make sure to take a _grpcio_ version that is compatible as there might be breaking changes between versions.
+The `requirements.txt` specifies the dependencies and the recommended versions. If you choose to install the libraries manually make sure to take a _grpcio_ version that is compatible as there might be breaking changes between versions. If you need to have a different version installed for another Python project consider using [virtualenv](https://virtualenv.pypa.io/en/stable/).
