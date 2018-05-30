@@ -32,8 +32,8 @@ Follow these steps to quickly set up and run an example of your choice on your l
 ### Qlik Sense Desktop
 1. Install Qlik Sense Desktop (June 2017 release or later).
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
-3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file located at *C:\Users\\[user]\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
-4. Copy the *.qvf* file from the selected example folder to *C:\Users\\[user]\Qlik\Sense\Apps*.
+3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file located at *C:\Users\\[user]\Documents\Qlik\Sense*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
+4. Copy the *.qvf* file from the selected example folder to *C:\Users\\[user]\Documents\Qlik\Sense\Apps*.
 5. Run the corresponding `<examplename>` python package. The easiest way to do this is to open a command prompt, go to the example\python folder and type:
 
    `python <examplename>`  
