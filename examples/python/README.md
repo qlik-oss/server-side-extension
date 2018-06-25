@@ -64,7 +64,7 @@ Note that both the request and the context are sent in every RPC call to the plu
 ```python
 import ServerSideExtension_pb2 as SSE
 
-class ExtensionExpression(SSE.ConnectorServicer):
+class ExtensionExpression(SSE.ConnectiorServicer):
     ...
     def GetCapabilities(self, request, context):
         # The plugin supports script evaluation
@@ -101,7 +101,7 @@ If you are interested in implementing a plugin that supports all script function
 import ServerSideExtension_pb2 as SSE
 from ScriptEval_helloworld import ScriptEval
 
-class ExtensionExpression(SSE.ConnectorServicer):
+class ExtensionExpression(SSE.ConnectiorServicer):
     ...
     def __init__(self):
         self.scriptEval = ScriptEval()
@@ -134,7 +134,7 @@ In the provided Python examples we have mapped each function Id to the name of t
 ```python
 import ServerSideExtension_pb2 as SSE
 
-class ExtensionExpression(SSE.ConnectorServicer):
+class ExtensionExpression(SSE.ConnectiorServicer):
     ...
     @property
     def functions(self):
