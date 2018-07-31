@@ -73,8 +73,9 @@ Follow these steps to quickly set up and run an example of your choice on your l
 1. Install QlikView Server (November 2017 release or later).
 2. Make sure you have Python 3.4 (or later) installed as well as the `grpcio` package. For more information, see [Prerequisites for running the Python examples](prerequisites.md).
 3. Add `SSEPlugin=<EngineName>,localhost:<port>` on a new line in your *Settings.ini* file, below the heading [Settings 7]. *Settings.ini* is located at *C:\ProgramData\QlikTech\QlikViewServer*. Insert the values for `<EngineName>` and `<port>` from the table above for the selected example.
-4. Add the *.qvw* file from the selected example folder to your document root (e.g. *C:\ProgramData\QlikTech\Documents*) or a mounted folder.
-5. Run the corresponding `<examplename>` python package. The easiest way to do this is to open a command prompt, go to the example\python folder and type:
+4. Open the QlikView Batch Settings.ini and add the same configuration as in step 3, to be able to reload the document. The default location is _C:\Windows\system32\config\systemprofile\AppData\Roaming\QlikTech\QlikViewBatch_.
+5. Add the *.qvw* file from the selected example folder to your document root (e.g. *C:\ProgramData\QlikTech\Documents*) or a mounted folder.
+6. Run the corresponding `<examplename>` python package. The easiest way to do this is to open a command prompt, go to the example\python folder and type:
 
    `python <examplename>`
 
