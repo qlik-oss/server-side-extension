@@ -25,7 +25,7 @@ Follow these steps to quickly set up and run an example of your choice on your l
 | __Example__ | __`<examplename>`__ | __`<EngineName>`__ | __`<port>`__ |
 | ----- | ----- | ----- | ----- |
 | __Hello world__ | helloworld | HelloWorld | 50052 |
-| __Column operations__ | columnsupport | Column | 50053 |
+| __Column operations__ | columnoperations | Column | 50053 |
 | __Full script support__ | fullscriptsupport | Script | 50051 |
 | __Full script support using Pandas__ | fullscriptsupport_pandas | ScriptPandas | 50056 |
 
