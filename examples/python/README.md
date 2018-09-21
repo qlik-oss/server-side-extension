@@ -192,7 +192,7 @@ The `CommonRequestHeader` is not used in any example provided for Python, but ca
 
 The `ScriptRequestHeader` is used in all examples for retrieving function type, return type, script etc.
 
-The `FunctionRequestHeader` is used in [HelloWorld](HelloWorld/README.md) and [ColumnOperations](ColumnOperations/README.md) where we have demonstrated plugin defined functions. The header is used for retrieving function id which we mapped to the implementation of the specific functions.
+The `FunctionRequestHeader` is used in [HelloWorld](helloworld/README.md) and [ColumnOperations](columnoperations/README.md) where we have demonstrated plugin defined functions. The header is used for retrieving function id which we mapped to the implementation of the specific functions.
 
 ## Metadata sent from the plugin to Qlik
 ### Cache control
