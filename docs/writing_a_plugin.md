@@ -135,7 +135,7 @@ When a script function is called from Qlik, this header is sent in the beginning
 The SSE plugin can also send metadata back to Qlik containing information about the result.
 
 #### Cache control
-The default behavior of the Qlik engine is to cache results from computations in order to reduce the workload and speed up response time. This is valid as well for computations performed by SSE plugins. For some cases caching might be undesirable and it is possible to toggle it off per request. When `EvaluateScript` or `ExecuteFunction` are called the http header key:value pair `qlik-cache:no-store` can be set in either the initial or trailing header data of the response. This functionality is demonstrated in the [Hello world example](../examples/python/HelloWorld/README.md#nocache-function).
+The default behavior of the Qlik engine is to cache results from computations in order to reduce the workload and speed up response time. This is valid as well for computations performed by SSE plugins. For some cases caching might be undesirable and it is possible to toggle it off per request. When `EvaluateScript` or `ExecuteFunction` are called the http header key:value pair `qlik-cache:no-store` can be set in either the initial or trailing header data of the response. This functionality is demonstrated in the [Hello world example](../examples/python/helloworld/README.md#nocache-function).
 
 Caching is automatically turned off in Qlik if a request fails due to the communication failure or an exception is raised during a call.
 
@@ -148,7 +148,7 @@ There are a few things to keep in mind when sending a `TableDescription`:
   * For example, if the datatype (int) is not set for a field (FieldDescription), the default value is 0, and the values of the returned field will be parsed in Qlik as strings.
   * An exception is the _field name_, which will be set by default to _Field{i}_ for the _i:th_ field returned to Qlik if no other name was set.
 
-See more details in the [TableDescription](SSE_Protocol.md#qlik.see.TableDescription) section in the protocol documentation and in the example [FullScriptSupport using Pandas](../examples/python/FullScriptSupport_Pandas/README.md) written in Python where the header can be modified directly from the script written in Qlik.
+See more details in the [TableDescription](SSE_Protocol.md#qlik.see.TableDescription) section in the protocol documentation and in the example [FullScriptSupport using Pandas](../examples/python/fullscriptsupport_pandas/README.md) written in Python where the header can be modified directly from the script written in Qlik.
 
 ## Using SSE expressions in a Qlik app/document
 
