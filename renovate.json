@@ -1,5 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "qlik-oss",
+    "qlik-oss:groupMinorPatch"
   ]
 }
