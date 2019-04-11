@@ -50,3 +50,6 @@ __Examples Disclaimer:__ The examples provided are just examples, therefore __us
 
 ## Contributing
 Please follow the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+
+## Getting help
+For quickest assistance, questions is best asked in #sse on [Qlik Branch slack](https://qlik-branch.slack.com). For access, go to [Qlik Branch](https://developer.qlik.com/#squad) and qlik on [SLACK](https://qlikbranch-slack-invite.herokuapp.com/).
