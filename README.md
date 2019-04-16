@@ -52,4 +52,11 @@ __Examples Disclaimer:__ The examples provided are just examples, therefore __us
 Please follow the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 ## Getting help
-For quickest assistance, questions is best asked in #sse on [Qlik Branch slack](https://qlik-branch.slack.com). For access, go to [Qlik Branch](https://developer.qlik.com/#squad) and qlik on [SLACK](https://qlikbranch-slack-invite.herokuapp.com/).
+1. Lok at the documentation and examples in this repo again. 
+2. Do a search in [Qlik Community](https://community.qlik.com/t5/Qlik-Server-Side-Extensions/bd-p/qlik-sse-discussions) to see if there is already an answer to your question.
+
+If not, you can either 
+* Ask your question in #sse on [Qlik Branch slack](https://qlik-branch.slack.com). For access, go to [Qlik Branch](https://developer.qlik.com/#squad) and qlik on [SLACK](https://qlikbranch-slack-invite.herokuapp.com/). This is good for small questions and usually gives quick feedback.
+* Create a new question on [Qlik Community](https://community.qlik.com/t5/forums/postpage/board-id/qlik-sse-discussions). This is a good option for questions you think more people are interested in since question and answer will remain for others to see.
+
+There are also several projects using SSE on [Qlik Branch](https://developer.qlik.com/globalsearch?search=sse%20aai) which can serve as useful examples.
