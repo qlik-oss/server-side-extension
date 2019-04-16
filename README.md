@@ -52,7 +52,7 @@ __Examples Disclaimer:__ The examples provided are just examples, therefore __us
 Please follow the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
 
 ## Getting help
-1. Lok at the documentation and examples in this repo again. 
+1. Look at the documentation and examples in this repo again. 
 2. Do a search in [Qlik Community](https://community.qlik.com/t5/Qlik-Server-Side-Extensions/bd-p/qlik-sse-discussions) to see if there is already an answer to your question.
 
 If not, you can either 
