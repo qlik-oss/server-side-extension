@@ -44,7 +44,7 @@ class ScriptEval:
                 for row in request_rows.rows:
                     # Retrieve parameters and append to data frame
                     params, dual_exist = self.get_arguments(context, arg_types, row.duals, header)
-                    q = q.append(params, ignore_index=True)
+                    q = pandas.concat([q, params], ignore_index=True)
 
             # Rename columns based on arg names in header
             arg_names = [param.name for param in header.params]
